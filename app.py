@@ -1,11 +1,13 @@
 import tkinter
 w = 1280
 h = 720
-canvas = tkinter.Canvas(width=w,height=h)
+canvas = tkinter.Canvas(width=w,height=h,bg="#71CAE7")
 canvas.pack()
 from random import *
 import datetime
 
+
+## Velmi neelegantne, no najjednoduchsie riesenie, widgety (type==int) musia byt globalne, aby sa mohli widget.destroy() v inych definiciach
 entryID=0
 buttonPrihlasit=0
 entryCardNum=0
@@ -15,6 +17,9 @@ entryAmount=0
 buttonPayment=0
 buttonBack=0
 labelMenuImg=0
+cvvLabel=0
+newroot = 0
+CVVinfoLabel=0
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -30,14 +35,14 @@ def menuScreen():
     buttonPrihlasit.pack()
     buttonPrihlasit.place(x=1/2*w,y=h-(0.4*h))
     menuImg = tkinter.PhotoImage(master=canvas,file='obrazky/menu.png')
-    labelMenuImg = tkinter.Label(image = menuImg)
+    labelMenuImg = tkinter.Label(image = menuImg,borderwidth=0)
     labelMenuImgimage = menuImg
     labelMenuImg.pack()
     labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
 
     
 def paymentScreen():
-    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg
+    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel
     print("PAYMENT SCREEN")
     canvas.delete("all")
     entryID.destroy()
@@ -59,7 +64,11 @@ def paymentScreen():
     entryCVVcard.pack()
     entryCVVcard.place(x=(w//2)+75,y=h-(0.61*h),height=30)
     canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kód" ,font="Arial 14", anchor="w", fill="red")
-    canvas.create_text((w//2)+75,h-(0.48*h),text="Čo je to CVV kód?" ,font="Arial 14 italic underline", anchor="w")
+    cvvLabel = tkinter.Label(text="Kde nájdem CVV kód?", font="Arial 14 italic underline",anchor="w",background="#e1e5e8")
+    cvvLabel.pack()
+    cvvLabel.place(x=(w//2)+73,y=h-(0.49*h))
+    cvvLabel.bind("<Button-1>",whatsCVVScreen)
+##    canvas.create_text((w//2)+75,h-(0.48*h),text="Čo je to CVV kód?" ,font="Arial 14 italic underline", anchor="w",tags="cvvlink")
     canvas.create_text((w//2)-100,h-(0.35*h),text="Suma: ",font="Arial 22", anchor="w")
     entryAmount = tkinter.Entry(width=8,font = "Helvetica 15 bold")
     entryAmount.pack()
@@ -84,9 +93,16 @@ def correctInfoImg(x,y):
     canvas.create_line(x-8,y,x,y+8,fill="green",width=4)
     canvas.create_line(x,y+8,x+11,y-11,fill="green",width=4)
     return
-    
+
+def whatsCVVScreen(event):
+    global w,h,newroot,CVVinfoLabel,newrootActive
+    newroot = tkinter.Tk()
+    CVVinfoLabel=tkinter.Label(newroot, text="CVV/CVC kód nájdete na zadnej strane karty napravo od vášho podpisového vzoru." + "\n" + "Keď platíte kartou cez internet, potrebujete zadať tento údaj ako verifikaciu.")
+    CVVinfoLabel.config(font=("Courier", 15))
+    CVVinfoLabel.pack()
+
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
@@ -94,6 +110,7 @@ def backBtn():
     entryAmount.destroy()
     buttonPayment.destroy()
     buttonBack.destroy()
+    cvvLabel.destroy()
     menuScreen()
-    
+
 menuScreen()
