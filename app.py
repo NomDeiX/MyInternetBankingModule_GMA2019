@@ -6,7 +6,6 @@ canvas.pack()
 from random import *
 import datetime
 
-
 entryID=0
 buttonPrihlasit=0
 entryCardNum=0
@@ -15,9 +14,10 @@ entryCVVcard=0
 entryAmount=0
 buttonPayment=0
 buttonBack=0
+labelMenuImg=0
 
 def menuScreen():
-    global w,h,entryID, buttonPrihlasit
+    global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
     print("MENU SCREEN")
     uctovnyDen = datetime.datetime.now()
     canvas.create_text((1/2)*w,h-(0.8*h),text="Internet Banking Prihlásenie" ,font="Arial 30", anchor="w")
@@ -29,14 +29,20 @@ def menuScreen():
     buttonPrihlasit = tkinter.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=paymentScreen)
     buttonPrihlasit.pack()
     buttonPrihlasit.place(x=1/2*w,y=h-(0.4*h))
+    menuImg = tkinter.PhotoImage(master=canvas,file='obrazky/menu.png')
+    labelMenuImg = tkinter.Label(image = menuImg)
+    labelMenuImgimage = menuImg
+    labelMenuImg.pack()
+    labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
 
-
+    
 def paymentScreen():
-    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack
+    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg
     print("PAYMENT SCREEN")
     canvas.delete("all")
     entryID.destroy()
     buttonPrihlasit.destroy()
+    labelMenuImg.config(image='')
     creditCardImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
     canvas.create_text((w//2)-275,h-(0.83*h),text="Číslo karty: " ,font="Arial 19", anchor="w")
     entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold")
@@ -91,4 +97,3 @@ def backBtn():
     menuScreen()
     
 menuScreen()
-
