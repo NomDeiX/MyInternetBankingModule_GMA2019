@@ -20,6 +20,7 @@ labelMenuImg=0
 cvvLabel=0
 newroot = 0
 CVVinfoLabel=0
+sv = tkinter.StringVar()
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -42,7 +43,7 @@ def menuScreen():
 
     
 def paymentScreen():
-    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel
+    global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
     print("PAYMENT SCREEN")
     canvas.delete("all")
     entryID.destroy()
@@ -60,9 +61,10 @@ def paymentScreen():
     entryDateCard.pack()
     entryDateCard.place(x=(w//2)-275,y=h-(0.61*h),height=30)
     canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
-    entryCVVcard = tkinter.Entry(width=5,font = "Helvetica 15 bold")
+    entryCVVcard = tkinter.Entry(width=5,font = "Helvetica 15 bold", textvariable=sv)
     entryCVVcard.pack()
     entryCVVcard.place(x=(w//2)+75,y=h-(0.61*h),height=30)
+    sv.trace("w", lambda name, index, mode, sv=sv: validateCVV())
     canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kód" ,font="Arial 14", anchor="w", fill="red")
     cvvLabel = tkinter.Label(text="Kde nájdem CVV kód?", font="Arial 14 italic underline",anchor="w",background="#e1e5e8")
     cvvLabel.pack()
@@ -112,5 +114,17 @@ def backBtn():
     buttonBack.destroy()
     cvvLabel.destroy()
     menuScreen()
+
+def validateCVV():
+    global entryCVVcard
+    CVV = str(entryCVVcard.get())
+    if (len(str(entryCVVcard.get()))>3):
+        print("The CVV entry widget has maximum of 3 characters")
+        entryCVVcard.delete(0,"end")
+        entryCVVcard.insert(0,CVV[:3])
+        print("First 3 characters: " + CVV[:3])
+        print("Characters you are trying to put in: " + CVV)
+    
+
 
 menuScreen()
