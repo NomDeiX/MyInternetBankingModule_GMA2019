@@ -54,23 +54,19 @@ def paymentScreen():
     entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold")
     entryCardNum.pack()
     entryCardNum.place(x=(w//2)-275,y=h-(0.78*h),height=30)
-    canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
     canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum splatnosti: " ,font="Arial 19", anchor="w")
     canvas.create_text((w//2)+75,h-(0.65*h),text="CVV kód: " ,font="Arial 19", anchor="w")
     entryDateCard = tkinter.Entry(width=15,font = "Helvetica 15 bold")
     entryDateCard.pack()
     entryDateCard.place(x=(w//2)-275,y=h-(0.61*h),height=30)
-    canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
     entryCVVcard = tkinter.Entry(width=5,font = "Helvetica 15 bold", textvariable=sv)
     entryCVVcard.pack()
     entryCVVcard.place(x=(w//2)+75,y=h-(0.61*h),height=30)
     sv.trace("w", lambda name, index, mode, sv=sv: validateCVV())
-    canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kód" ,font="Arial 14", anchor="w", fill="red")
     cvvLabel = tkinter.Label(text="Kde nájdem CVV kód?", font="Arial 14 italic underline",anchor="w",background="#e1e5e8")
     cvvLabel.pack()
     cvvLabel.place(x=(w//2)+73,y=h-(0.49*h))
     cvvLabel.bind("<Button-1>",whatsCVVScreen)
-##    canvas.create_text((w//2)+75,h-(0.48*h),text="Čo je to CVV kód?" ,font="Arial 14 italic underline", anchor="w",tags="cvvlink")
     canvas.create_text((w//2)-100,h-(0.35*h),text="Suma: ",font="Arial 22", anchor="w")
     entryAmount = tkinter.Entry(width=8,font = "Helvetica 15 bold")
     entryAmount.pack()
@@ -85,6 +81,7 @@ def paymentScreen():
     correctInfoImg((w//2)+80,h-(0.76*h))
     correctInfoImg((w//2)-83,h-(0.59*h))
     correctInfoImg((w//2)+155,h-(0.59*h))
+    errorCreditInfo() #TODO: delete and move it to check after button clicked
     
 def creditCardImg(x1, y1, x2, y2, r=50, **kwargs):    
     points = (x1+r, y1, x1+r, y1, x2-r, y1, x2-r, y1, x2, y1, x2, y1+r, x2, y1+r, x2, y2-r, x2, y2-r, x2, y2, x2-r, y2, x2-r, y2, x1+r, y2, x1+r, y2, x1, y2, x1, y2-r, x1, y2-r, x1, y1+r, x1, y1+r, x1, y1)
@@ -125,6 +122,13 @@ def validateCVV():
         print("First 3 characters: " + CVV[:3])
         print("Characters you are trying to put in: " + CVV)
     
+
+def errorCreditInfo():
+    if (True):
+        canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
+        canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
+        canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kód" ,font="Arial 14", anchor="w", fill="red")
+
 
 
 menuScreen()
