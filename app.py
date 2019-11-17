@@ -21,6 +21,9 @@ cvvLabel=0
 newroot = 0
 CVVinfoLabel=0
 sv = tkinter.StringVar()
+creditCardType=""
+labelCreditCardImg=0
+
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -51,7 +54,9 @@ def paymentScreen():
     labelMenuImg.config(image='')
     creditCardImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
     canvas.create_text((w//2)-275,h-(0.83*h),text="Číslo karty: " ,font="Arial 19", anchor="w")
-    entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold")
+    cardTypeSV=tkinter.StringVar()
+    cardTypeSV.trace("w", lambda name, index, mode, sv=cardTypeSV: cardTypeChecker())
+    entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold",textvariable=cardTypeSV)
     entryCardNum.pack()
     entryCardNum.place(x=(w//2)-275,y=h-(0.78*h),height=30)
     canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum splatnosti: " ,font="Arial 19", anchor="w")
@@ -82,6 +87,7 @@ def paymentScreen():
     correctInfoImg((w//2)-83,h-(0.59*h))
     correctInfoImg((w//2)+155,h-(0.59*h))
     errorCreditInfo() #TODO: delete and move it to check after button clicked
+
     
 def creditCardImg(x1, y1, x2, y2, r=50, **kwargs):    
     points = (x1+r, y1, x1+r, y1, x2-r, y1, x2-r, y1, x2, y1, x2, y1+r, x2, y1+r, x2, y2-r, x2, y2-r, x2, y2, x2-r, y2, x2-r, y2, x1+r, y2, x1+r, y2, x1, y2, x1, y2-r, x1, y2-r, x1, y1+r, x1, y1+r, x1, y1)
@@ -101,7 +107,7 @@ def whatsCVVScreen(event):
     CVVinfoLabel.pack()
 
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCardImg
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
@@ -110,6 +116,7 @@ def backBtn():
     buttonPayment.destroy()
     buttonBack.destroy()
     cvvLabel.destroy()
+    labelCardImg.config(image='')
     menuScreen()
 
 def validateCVV():
@@ -129,6 +136,34 @@ def errorCreditInfo():
         canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
         canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kód" ,font="Arial 14", anchor="w", fill="red")
 
+def CreditTypePicker():
+    global labelCreditCardImg, creditCardImg, creditCardType
+    if (creditCardType=="Visa"):
+        creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/VisaLogo.png')
+    elif (creditCardType=="MasterCard"):
+        creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/MasterCardLogo.png')
+    elif (creditCardType=="AmericanExpress"):
+        creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/AmericanExpressLogo.png')
+    elif (creditCardType=="Other"):
+        creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/OtherLogo.png')
+    labelCreditCardImg = tkinter.Label(image = creditCardImg,borderwidth=0)
+    labelCreditCardImgimage = creditCardImg
+    labelCreditCardImg.pack()
+    labelCreditCardImg.place(x=0.6*w,y=h-(0.77*h), anchor="w")
 
-
+def cardTypeChecker():
+    global entryCardNum,creditCardType
+    CardNumber = str(entryCardNum.get())
+    if(len(CardNumber)>=1):
+        firstNumber = CardNumber[0]
+        if (int(firstNumber)==4):
+            creditCardType="Visa"
+        elif(int(firstNumber)==5):
+            creditCardType="MasterCard"
+        elif(int(firstNumber)==3):
+            creditCardType="AmericanExpress"
+        else:
+            creditCardType="Other"
+    CreditTypePicker()  
+    
 menuScreen()
