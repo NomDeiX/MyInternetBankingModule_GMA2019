@@ -52,7 +52,8 @@ def paymentScreen():
     entryID.destroy()
     buttonPrihlasit.destroy()
     labelMenuImg.config(image='')
-    creditCardImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
+    labelMenuImg.destroy()
+    creditCardBackgroundImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
     canvas.create_text((w//2)-275,h-(0.83*h),text="Číslo karty: " ,font="Arial 19", anchor="w")
     cardTypeSV=tkinter.StringVar()
     cardTypeSV.trace("w", lambda name, index, mode, sv=cardTypeSV: cardTypeChecker())
@@ -87,9 +88,9 @@ def paymentScreen():
     correctInfoImg((w//2)-83,h-(0.59*h))
     correctInfoImg((w//2)+155,h-(0.59*h))
     errorCreditInfo() #TODO: delete and move it to check after button clicked
-
+    cardTypeChecker()
     
-def creditCardImg(x1, y1, x2, y2, r=50, **kwargs):    
+def creditCardBackgroundImg(x1, y1, x2, y2, r=50, **kwargs):    
     points = (x1+r, y1, x1+r, y1, x2-r, y1, x2-r, y1, x2, y1, x2, y1+r, x2, y1+r, x2, y2-r, x2, y2-r, x2, y2, x2-r, y2, x2-r, y2, x1+r, y2, x1+r, y2, x1, y2, x1, y2-r, x1, y2-r, x1, y1+r, x1, y1+r, x1, y1)
     return canvas.create_polygon(points, **kwargs, smooth=True,outline="black", fill="#e1e5e8")
 
@@ -107,7 +108,7 @@ def whatsCVVScreen(event):
     CVVinfoLabel.pack()
 
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCardImg
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
@@ -116,7 +117,8 @@ def backBtn():
     buttonPayment.destroy()
     buttonBack.destroy()
     cvvLabel.destroy()
-    labelCardImg.config(image='')
+    labelCreditCardImg.config(image='')
+    labelCreditCardImg.destroy()   
     menuScreen()
 
 def validateCVV():
@@ -138,7 +140,9 @@ def errorCreditInfo():
 
 def CreditTypePicker():
     global labelCreditCardImg, creditCardImg, creditCardType
-    if (creditCardType=="Visa"):
+    if (creditCardType==""):
+        creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/defaultLogo.png')
+    elif (creditCardType=="Visa"):
         creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/VisaLogo.png')
     elif (creditCardType=="MasterCard"):
         creditCardImg = tkinter.PhotoImage(master=canvas,file='obrazky/MasterCardLogo.png')
@@ -164,6 +168,9 @@ def cardTypeChecker():
             creditCardType="AmericanExpress"
         else:
             creditCardType="Other"
+    elif(len(CardNumber)==0):
+        creditCardType=""
     CreditTypePicker()  
-    
+
+   
 menuScreen()
