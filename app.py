@@ -43,7 +43,7 @@ def menuScreen():
     labelMenuImgimage = menuImg
     labelMenuImg.pack()
     labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
-
+    
     
 def paymentScreen():
     global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
@@ -108,7 +108,7 @@ def whatsCVVScreen(event):
     CVVinfoLabel.pack()
 
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg,creditCardImg
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
@@ -117,8 +117,9 @@ def backBtn():
     buttonPayment.destroy()
     buttonBack.destroy()
     cvvLabel.destroy()
-    labelCreditCardImg.config(image='')
-    labelCreditCardImg.destroy()   
+    labelCreditCardImg.place(x=0,y=0, anchor="w")
+    labelCreditCardImg.config(image='',width=1)
+    labelCreditCardImg.destroy()    ## TODO !!!! Nech sa image deletne ked pojde spat na menu aby nezakryval nadpis
     menuScreen()
 
 def validateCVV():
@@ -154,6 +155,8 @@ def CreditTypePicker():
     labelCreditCardImgimage = creditCardImg
     labelCreditCardImg.pack()
     labelCreditCardImg.place(x=0.6*w,y=h-(0.77*h), anchor="w")
+    canvas.create_window(0.63*w, h-(0.77*h), window=labelCreditCardImg) 
+
 
 def cardTypeChecker():
     global entryCardNum,creditCardType
