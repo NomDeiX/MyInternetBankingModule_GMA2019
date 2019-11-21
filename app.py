@@ -119,7 +119,7 @@ def backBtn():
     cvvLabel.destroy()
     labelCreditCardImg.place(x=0,y=0, anchor="w")
     labelCreditCardImg.config(image='',width=1)
-    labelCreditCardImg.destroy()    ## TODO !!!! Nech sa image deletne ked pojde spat na menu aby nezakryval nadpis
+    labelCreditCardImg.destroy()
     menuScreen()
 
 def validateCVV():
