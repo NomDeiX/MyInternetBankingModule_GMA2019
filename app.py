@@ -143,16 +143,17 @@ def validateCVV():
         
 def validateAll(event):
     print("kruna")
-    global correctInfoImg,CVV,CardNumber,entryCVVcard,dateCard,CardNumber
+    global correctInfoImg,CVV,CardNumber,entryCVVcard,dateCard,CardNumber,correctnessOfData
     canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8')
     canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8')
     canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8')
+    correctnessOfData=0
     if (len(CVV)==3 and entryCVVcard.get().isdigit()==True ):
         correctInfoImg((w//2)+155,h-(0.59*h))
     if (len(CardNumber.replace(" ", ""))==16 and CardNumber.replace(" ", "").isdigit()==True):
         correctInfoImg((w//2)+80,h-(0.76*h))
-    if(len(dateCard.replace("/",""))==4) and (int(dateCard.replace("/","")[0])==0 or int(dateCard.replace("/","")[0])==1) and (int(dateCard.replace("/","")[3])>=1) and dateCard.replace("/","").isdigit()==True:    
-        correctInfoImg((w//2)-83,h-(0.59*h))   
+    if(len(dateCard.replace("/",""))==4) and (int(dateCard.replace("/","")[0])==0 or int(dateCard.replace("/","")[0])==1) and (1<=int(dateCard.replace("/","")[2])<=3) and dateCard.replace("/","").isdigit()==True:    
+        correctInfoImg((w//2)-83,h-(0.59*h))
     
     
 def validateCardNumber():
@@ -231,12 +232,14 @@ def cardTypeChecker():
 
 
 def transaction():
-    global Amount,entryAmount
+    global Amount,entryAmount, CardNumber,dateCard,CVV
     print("gg")
     if (len(entryAmount.get())!=0):
         print("starting transaction")
         Amount = float(entryAmount.get())
         print("Amount: " + str(Amount))
+        suborTest = open('Transaction.txt', 'w+')
+        suborTest.write(CardNumber + " " + dateCard + " " + CVV)
     elif(len(entryAmount.get())==0):
         print("transcation failed")
         canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v správnom tvare" ,font="Arial 14", anchor="w", fill="red")
@@ -244,4 +247,3 @@ def transaction():
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
-
