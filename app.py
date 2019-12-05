@@ -239,7 +239,13 @@ def transaction():
         Amount = float(entryAmount.get())
         print("Amount: " + str(Amount))
         suborTest = open('Transaction.txt', 'w+')
-        suborTest.write(CardNumber + " " + dateCard + " " + CVV)
+        suborTest.write(CardNumber + " " + dateCard.replace("/","")[:4] + " " + CVV)
+        kartySubor = open("karty.txt","r+")
+        kartyriadok = kartySubor.readline()
+        for i in range(int(kartyriadok)):
+            if (CardNumber in kartyriadok):
+                print("date: " + kartyriadok[kartyriadok.find(";",10)+1:kartyriadok.find(";",10)+5])
+            kartyriadok = kartySubor.readline()
     elif(len(entryAmount.get())==0):
         print("transcation failed")
         canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v správnom tvare" ,font="Arial 14", anchor="w", fill="red")
