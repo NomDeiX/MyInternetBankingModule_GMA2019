@@ -28,6 +28,8 @@ CardNumber=""
 dateCard=""
 CVV=""
 Amount=0
+IDobchodnik = 0
+
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -51,48 +53,56 @@ def menuScreen():
     
 def paymentScreen():
     global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
-    print("PAYMENT SCREEN")
-    canvas.delete("all")
-    entryID.destroy()
-    buttonPrihlasit.destroy()
-    labelMenuImg.config(image='')
-    labelMenuImg.destroy()
-    creditCardBackgroundImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
-    canvas.create_text((w//2)-275,h-(0.83*h),text="Číslo karty: " ,font="Arial 19", anchor="w")
-    cardTypeSV=tkinter.StringVar()
-    cardTypeSV.trace("w", lambda name, index, mode, sv=cardTypeSV: cardTypeChecker())
-    entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold",textvariable=cardTypeSV)
-    entryCardNum.pack()
-    entryCardNum.place(x=(w//2)-275,y=h-(0.78*h),height=30)
-    canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum splatnosti: " ,font="Arial 19", anchor="w")
-    canvas.create_text((w//2)+75,h-(0.65*h),text="CVV kód: " ,font="Arial 19", anchor="w")
-    cardDateSV=tkinter.StringVar()
-    cardDateSV.trace("w", lambda name, index, mode, sv=cardDateSV: validateDate())
-    entryDateCard = tkinter.Entry(width=15,font = "Helvetica 15 bold",textvariable=cardDateSV)
-    entryDateCard.pack()
-    entryDateCard.place(x=(w//2)-275,y=h-(0.61*h),height=30)
-    entryCVVcard = tkinter.Entry(width=5,font = "Helvetica 15 bold", textvariable=sv)
-    entryCVVcard.pack()
-    entryCVVcard.place(x=(w//2)+75,y=h-(0.61*h),height=30)
-    sv.trace("w", lambda name, index, mode, sv=sv: validateCVV())
-    cvvLabel = tkinter.Label(text="Kde nájdem CVV kód?", font="Arial 14 italic underline",anchor="w",background="#e1e5e8")
-    cvvLabel.pack()
-    cvvLabel.place(x=(w//2)+73,y=h-(0.49*h))
-    cvvLabel.bind("<Button-1>",whatsCVVScreen)
-    canvas.create_text((w//2)-100,h-(0.35*h),text="Suma: ",font="Arial 22", anchor="w")
-    entryAmount = tkinter.Entry(width=8,font = "Helvetica 15 bold")
-    entryAmount.pack()
-    entryAmount.place(x=(w//2),y=h-(0.37*h),height=30)
-    canvas.create_text((w//2)+100,h-(0.35*h),text="€",font="Arial 22", anchor="w")
-    buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transaction)
-    buttonPayment.pack()
-    buttonPayment.place(x=(w//2)-92,y=h-(0.3*h))
-    buttonBack = tkinter.Button(text='SPÄŤ', font="Helvetica 15",command=backBtn)
-    buttonBack.pack()
-    buttonBack.place(x=(w//2)-300,y=h-(0.3*h))
-    errorCreditInfo() #TODO: delete and move it to check after button clicked
-    cardTypeChecker()
+    checkObchodnik()
+    if (IDobchodnik!=""):
+        print("PAYMENT SCREEN")
+        canvas.delete("all")
+        entryID.destroy()
+        buttonPrihlasit.destroy()
+        labelMenuImg.config(image='')
+        labelMenuImg.destroy()
+        creditCardBackgroundImg((w//2)-300,h-0.92*h,(w//2)+300,h-0.42*h)
+        canvas.create_text((w//2)-275,h-(0.83*h),text="Číslo karty: " ,font="Arial 19", anchor="w")
+        cardTypeSV=tkinter.StringVar()
+        cardTypeSV.trace("w", lambda name, index, mode, sv=cardTypeSV: cardTypeChecker())
+        entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold",textvariable=cardTypeSV)
+        entryCardNum.pack()
+        entryCardNum.place(x=(w//2)-275,y=h-(0.78*h),height=30)
+        canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum splatnosti: " ,font="Arial 19", anchor="w")
+        canvas.create_text((w//2)+75,h-(0.65*h),text="CVV kód: " ,font="Arial 19", anchor="w")
+        cardDateSV=tkinter.StringVar()
+        cardDateSV.trace("w", lambda name, index, mode, sv=cardDateSV: validateDate())
+        entryDateCard = tkinter.Entry(width=15,font = "Helvetica 15 bold",textvariable=cardDateSV)
+        entryDateCard.pack()
+        entryDateCard.place(x=(w//2)-275,y=h-(0.61*h),height=30)
+        entryCVVcard = tkinter.Entry(width=5,font = "Helvetica 15 bold", textvariable=sv)
+        entryCVVcard.pack()
+        entryCVVcard.place(x=(w//2)+75,y=h-(0.61*h),height=30)
+        sv.trace("w", lambda name, index, mode, sv=sv: validateCVV())
+        cvvLabel = tkinter.Label(text="Kde nájdem CVV kód?", font="Arial 14 italic underline",anchor="w",background="#e1e5e8")
+        cvvLabel.pack()
+        cvvLabel.place(x=(w//2)+73,y=h-(0.49*h))
+        cvvLabel.bind("<Button-1>",whatsCVVScreen)
+        canvas.create_text((w//2)-100,h-(0.35*h),text="Suma: ",font="Arial 22", anchor="w")
+        entryAmount = tkinter.Entry(width=8,font = "Helvetica 15 bold")
+        entryAmount.pack()
+        entryAmount.place(x=(w//2),y=h-(0.37*h),height=30)
+        canvas.create_text((w//2)+100,h-(0.35*h),text="€",font="Arial 22", anchor="w")
+        buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transaction)
+        buttonPayment.pack()
+        buttonPayment.place(x=(w//2)-92,y=h-(0.3*h))
+        buttonBack = tkinter.Button(text='SPÄŤ', font="Helvetica 15",command=backBtn)
+        buttonBack.pack()
+        buttonBack.place(x=(w//2)-300,y=h-(0.3*h))
+        errorCreditInfo() 
+        cardTypeChecker()
     
+
+def checkObchodnik():
+    global IDobchodnik,entryID
+    IDobchodnik = entryID.get()
+
+
 def creditCardBackgroundImg(x1, y1, x2, y2, r=50, **kwargs):    
     points = (x1+r, y1, x1+r, y1, x2-r, y1, x2-r, y1, x2, y1, x2, y1+r, x2, y1+r, x2, y2-r, x2, y2-r, x2, y2, x2-r, y2, x2-r, y2, x1+r, y2, x1+r, y2, x1, y2, x1, y2-r, x1, y2-r, x1, y1+r, x1, y1+r, x1, y1)
     return canvas.create_polygon(points, **kwargs, smooth=True,outline="black", fill="#e1e5e8")
@@ -130,6 +140,22 @@ def backBtn():
     labelCreditCardImg.destroy()  
     menuScreen()
 
+def validateAll(event): 
+    global IDobchodnik
+    if (IDobchodnik!="" and IDobchodnik!=0):
+        global correctInfoImg,CVV,CardNumber,entryCVVcard,dateCard,CardNumber,correctnessOfData
+        canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8')
+        canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8')
+        canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8')
+        correctnessOfData=0
+        if (len(CVV)==3 and entryCVVcard.get().isdigit()==True ):
+            correctInfoImg((w//2)+155,h-(0.59*h))
+        if (len(CardNumber.replace(" ", ""))==16 and CardNumber.replace(" ", "").isdigit()==True):
+            correctInfoImg((w//2)+80,h-(0.76*h))
+        if(len(dateCard.replace("/",""))==4) and (int(dateCard.replace("/","")[0])==0 or int(dateCard.replace("/","")[0])==1) and (int(dateCard.replace("/","")[0:2])<=13) and (2<=int(dateCard.replace("/","")[2])<=3) and dateCard.replace("/","").isdigit()==True:    
+            correctInfoImg((w//2)-83,h-(0.59*h))
+
+
 def validateCVV():
     global entryCVVcard,CVV
     CVV = str(entryCVVcard.get())
@@ -140,21 +166,7 @@ def validateCVV():
         print("First 3 characters: " + CVV[:3])
         print("Characters you are trying to put in: " + CVV)
         CVV =entryCVVcard.get()
-        
-def validateAll(event):
-    print("kruna")
-    global correctInfoImg,CVV,CardNumber,entryCVVcard,dateCard,CardNumber,correctnessOfData
-    canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8')
-    canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8')
-    canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8')
-    correctnessOfData=0
-    if (len(CVV)==3 and entryCVVcard.get().isdigit()==True ):
-        correctInfoImg((w//2)+155,h-(0.59*h))
-    if (len(CardNumber.replace(" ", ""))==16 and CardNumber.replace(" ", "").isdigit()==True):
-        correctInfoImg((w//2)+80,h-(0.76*h))
-    if(len(dateCard.replace("/",""))==4) and (int(dateCard.replace("/","")[0])==0 or int(dateCard.replace("/","")[0])==1) and (1<=int(dateCard.replace("/","")[2])<=3) and dateCard.replace("/","").isdigit()==True:    
-        correctInfoImg((w//2)-83,h-(0.59*h))
-    
+           
     
 def validateCardNumber():
     global entryCardNum,CardNumber
@@ -175,8 +187,13 @@ def validateCardNumber():
 
 def validateDate():
     global entryDateCard,dateCard
+    print("bbb")
+    if (len(entryDateCard.get())==5):
+        print("ccc")
+        entryDateCard.insert(0,dateCard)
     dateCard = entryDateCard.get()
-    if (2<=len(entryDateCard.get())<=5 and (entryDateCard.get().find("/")!=2)):  ## NEFUNGUJE KURNIIIIK
+    if (2<=len(entryDateCard.get())<=4 and (entryDateCard.get().find("/")!=2)):  ## NEFUNGUJE KURNIIIIK
+        print("aaa")
         dateCard.replace("/","")
         entryDateCard.delete(0,"end")
         entryDateCard.insert(0,dateCard)
