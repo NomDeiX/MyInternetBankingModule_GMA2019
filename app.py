@@ -5,7 +5,7 @@ canvas = tkinter.Canvas(width=w,height=h,bg="#71CAE7")
 canvas.pack()
 from random import *
 import datetime
-
+import time
 
 ## Velmi neelegantne, no najjednoduchsie riesenie, widgety (type==int) musia byt globalne, aby sa mohli widget.destroy() v inych definiciach
 entryID=0
@@ -29,7 +29,8 @@ dateCard=""
 CVV=""
 Amount=0
 IDobchodnik = 0
-
+casGIF = 0
+timer=0
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -49,12 +50,12 @@ def menuScreen():
     labelMenuImgimage = menuImg
     labelMenuImg.pack()
     labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
-    
+    canvas.delete("correctInfoTag")
     
 def paymentScreen():
     global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
     checkObchodnik()
-    if (IDobchodnik!=""):
+    if (IDobchodnik!="" and IDobchodnik!=0 and str(IDobchodnik).isdigit()==True):
         print("PAYMENT SCREEN")
         canvas.delete("all")
         entryID.destroy()
@@ -96,6 +97,11 @@ def paymentScreen():
         buttonBack.place(x=(w//2)-300,y=h-(0.3*h))
         errorCreditInfo() 
         cardTypeChecker()
+        entryAmount.bind('<Button-1>', validateAll)
+        entryCardNum.bind('<Button-1>', validateAll)
+        entryCVVcard.bind('<Button-1>', validateAll)
+        entryDateCard.bind('<Button-1>', validateAll)
+    
     
 
 def checkObchodnik():
@@ -108,9 +114,9 @@ def creditCardBackgroundImg(x1, y1, x2, y2, r=50, **kwargs):
     return canvas.create_polygon(points, **kwargs, smooth=True,outline="black", fill="#e1e5e8")
 
 def correctInfoImg(x,y):
-    canvas.create_oval(x-15,y+15,x+15,y-15, fill="white", outline="black")
-    canvas.create_line(x-8,y,x,y+8,fill="green",width=4)
-    canvas.create_line(x,y+8,x+11,y-11,fill="green",width=4)
+    canvas.create_oval(x-15,y+15,x+15,y-15, fill="white", outline="black",tags="correctInfoTag")
+    canvas.create_line(x-8,y,x,y+8,fill="green",width=4,tags="correctInfoTag")
+    canvas.create_line(x,y+8,x+11,y-11,fill="green",width=4,tags="correctInfoTag")
     return
 
 def whatsCVVScreen(event):
@@ -126,7 +132,7 @@ def whatsCVVScreen(event):
         cvvSwitch = False
 
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg,creditCardImg
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg,creditCardImg,IDobchodnik
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
@@ -137,16 +143,18 @@ def backBtn():
     cvvLabel.destroy()
     labelCreditCardImg.place(x=0,y=0, anchor="w")
     labelCreditCardImg.config(image='',width=1)
-    labelCreditCardImg.destroy()  
+    labelCreditCardImg.destroy()
+    IDobchodnik = ""
     menuScreen()
 
-def validateAll(event): 
+def validateAll(event):
+    print("click")
     global IDobchodnik
     if (IDobchodnik!="" and IDobchodnik!=0):
         global correctInfoImg,CVV,CardNumber,entryCVVcard,dateCard,CardNumber,correctnessOfData
-        canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8')
-        canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8')
-        canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8')
+        canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
         correctnessOfData=0
         if (len(CVV)==3 and entryCVVcard.get().isdigit()==True ):
             correctInfoImg((w//2)+155,h-(0.59*h))
@@ -251,7 +259,11 @@ def cardTypeChecker():
 def transaction():
     global Amount,entryAmount, CardNumber,dateCard,CVV
     print("gg")
-    if (len(entryAmount.get())!=0):
+    if (len(entryAmount.get())>0):
+        canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
+        canvas.create_text(650,670,text="Transakcia sa spracúvava",font="Helvetica 18")
+        loadingGIF()
+        disableEntries()
         print("starting transaction")
         Amount = float(entryAmount.get())
         print("Amount: " + str(Amount))
@@ -265,8 +277,57 @@ def transaction():
             kartyriadok = kartySubor.readline()
     elif(len(entryAmount.get())==0):
         print("transcation failed")
-        canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v správnom tvare" ,font="Arial 14", anchor="w", fill="red")
+        canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50" ,font="Arial 14", anchor="w", fill="red")
      
+
+
+def loadingGIF():
+    global casGIF,timer
+    canvas.create_rectangle(420+100*casGIF,600-20,420+100*casGIF+20,600+20,fill="gray",tags="casovanie")
+    timer = canvas.after(1000,loadingGIF)
+    casGIF+=1
+    if (casGIF==6):
+        canvas.delete("casovanie")
+        casGIF=0
+
+
+def disableEntries():
+    entryAmount.config(state='disabled')
+    entryCardNum.config(state='disabled')
+    entryDateCard.config(state='disabled')
+    entryCVVcard.config(state='disabled')
+    buttonBack.config(state='disabled')
+    buttonPayment.config(state='disabled')
+
+def enableEntries():
+    canvas.create_rectangle(350,700,950,575,fill="#71CAE7",outline="#71CAE7")
+    entryAmount.config(state='normal')
+    entryCardNum.config(state='normal')
+    entryDateCard.config(state='normal')
+    entryCVVcard.config(state='normal')
+    buttonBack.config(state='normal')
+    buttonPayment.config(state='normal')
+
+def everythingIsDone():
+    enableEntries()
+    entryCVVcard.delete(0,"end")
+    canvas.delete("correctInfoTag")
+    backBtn()
+    
+def transactionSuccessful():
+    global timer
+    canvas.after_cancel(timer)
+    canvas.delete("casovanie")
+    canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
+    canvas.create_text(650,630,text="Transakcia bola úspešná.",font="Helvetica 18")
+    canvas.create_text(650,660,text="Budete presmerovaný na hlavnú stránku.",font="Helvetica 18")
+    everythingIsDone()
+    waiting() ##TODO TIMER
+    
+
+def waiting():
+    canvas.after(4000)
+    
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
