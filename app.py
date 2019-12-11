@@ -259,7 +259,7 @@ def cardTypeChecker():
 def transaction():
     global Amount,entryAmount, CardNumber,dateCard,CVV
     print("gg")
-    if (len(entryAmount.get())>0):
+    if (len(entryAmount.get())>0 and float(entryAmount.get())>0.00):
         canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
         canvas.create_text(650,670,text="Transakcia sa spracúvava",font="Helvetica 18")
         loadingGIF()
@@ -268,7 +268,7 @@ def transaction():
         Amount = float(entryAmount.get())
         print("Amount: " + str(Amount))
         suborTest = open('Transaction.txt', 'w+')
-        suborTest.write(CardNumber + " " + dateCard.replace("/","")[:4] + " " + CVV)
+        suborTest.write(CardNumber + " " + dateCard.replace("/","")[:4] + " " + CVV + " " + str(Amount))
         kartySubor = open("karty.txt","r+")
         kartyriadok = kartySubor.readline()
         for i in range(int(kartyriadok)):
