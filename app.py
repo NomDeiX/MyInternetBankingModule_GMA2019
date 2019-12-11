@@ -6,6 +6,7 @@ canvas.pack()
 from random import *
 import datetime
 import time
+import os
 
 ## Velmi neelegantne, no najjednoduchsie riesenie, widgety (type==int) musia byt globalne, aby sa mohli widget.destroy() v inych definiciach
 entryID=0
@@ -31,6 +32,10 @@ Amount=0
 IDobchodnik = 0
 casGIF = 0
 timer=0
+continueProcess=0
+cardID = 0
+
+kartyriadok = 0
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -89,7 +94,7 @@ def paymentScreen():
         entryAmount.pack()
         entryAmount.place(x=(w//2),y=h-(0.37*h),height=30)
         canvas.create_text((w//2)+100,h-(0.35*h),text="€",font="Arial 22", anchor="w")
-        buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transaction)
+        buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transactionValidation)
         buttonPayment.pack()
         buttonPayment.place(x=(w//2)-92,y=h-(0.3*h))
         buttonBack = tkinter.Button(text='SPÄŤ', font="Helvetica 15",command=backBtn)
@@ -146,6 +151,9 @@ def backBtn():
     labelCreditCardImg.destroy()
     IDobchodnik = ""
     menuScreen()
+    CardNumber=""
+    dateCard=""
+    CVV=""
 
 def validateAll(event):
     print("click")
@@ -164,6 +172,38 @@ def validateAll(event):
             correctInfoImg((w//2)-83,h-(0.59*h))
 
 
+def transactionValidation():
+    global continueProcess
+    continueProcess = 0
+    if (len(CVV)==3 and entryCVVcard.get().isdigit()==True ):
+        canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_rectangle((w//2)+75,h-(0.53*h)-15,(w//2)+250,h-(0.53*h)+10,fill="#e1e5e8",outline='#e1e5e8',tags="incorrectInfoTag")
+        correctInfoImg((w//2)+155,h-(0.59*h))
+        continueProcess+=1
+    elif (len(CVV)!=3 or entryCVVcard.get().isdigit()==False ):
+        canvas.create_rectangle((w//2)+155-15,h-(0.59*h)+15,(w//2)+155+15,(h-(0.59*h)-15),fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
+    if (len(CardNumber.replace(" ", ""))==16 and CardNumber.replace(" ", "").isdigit()==True):
+        canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_rectangle((w//2)-275,h-(0.7*h)-15,(w//2)+100,h-(0.7*h)+10,fill="#e1e5e8",outline='#e1e5e8',tags="incorrectInfoTag")
+        correctInfoImg((w//2)+80,h-(0.76*h))
+        continueProcess+=1
+    elif(len(CardNumber.replace(" ", ""))!=16 or CardNumber.replace(" ", "").isdigit()==False):
+        canvas.create_rectangle((w//2)+80-15,(h-(0.76*h))+15,(w//2)+80+15,(h-(0.76*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
+    if(len(dateCard.replace("/",""))==4) and (int(dateCard.replace("/","")[0])==0 or int(dateCard.replace("/","")[0])==1) and (int(dateCard.replace("/","")[0:2])<=13) and (2<=int(dateCard.replace("/","")[2])<=3) and (dateCard.replace("/","").isdigit()==True):
+        canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_rectangle((w//2)-275,h-(0.53*h)-15,(w//2)+50,h-(0.53*h)+10,fill="#e1e5e8",outline='#e1e5e8',tags="incorrectInfoTag")
+        correctInfoImg((w//2)-83,h-(0.59*h))
+        continueProcess+=1
+    elif(len(dateCard.replace("/",""))!=4) or (int(dateCard.replace("/","")[0])!=0 and int(dateCard.replace("/","")[0])!=1) or (int(dateCard.replace("/","")[0:2])>=13) or (0<=int(dateCard.replace("/","")[2])<=1 or 4<=int(dateCard.replace("/","")[2])) or (dateCard.replace("/","").isdigit()==False):
+        canvas.create_rectangle(((w//2)-83)-15,(h-(0.59*h))+15,((w//2)-83)+15,(h-(0.59*h))-15,fill="#e1e5e8",outline='#e1e5e8',tags="correctInfoTag")
+        canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
+    if (continueProcess==3):
+        print("calling transaction")
+        transaction()
+
+        
 def validateCVV():
     global entryCVVcard,CVV
     CVV = str(entryCVVcard.get())
@@ -195,13 +235,10 @@ def validateCardNumber():
 
 def validateDate():
     global entryDateCard,dateCard
-    print("bbb")
     if (len(entryDateCard.get())==5):
-        print("ccc")
         entryDateCard.insert(0,dateCard)
     dateCard = entryDateCard.get()
     if (2<=len(entryDateCard.get())<=4 and (entryDateCard.get().find("/")!=2)):  ## NEFUNGUJE KURNIIIIK
-        print("aaa")
         dateCard.replace("/","")
         entryDateCard.delete(0,"end")
         entryDateCard.insert(0,dateCard)
@@ -213,7 +250,7 @@ def validateDate():
 
 
 def errorCreditInfo():
-    if (True):
+    if (False):
         canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
         canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
         canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
@@ -269,12 +306,8 @@ def transaction():
         print("Amount: " + str(Amount))
         suborTest = open('Transaction.txt', 'w+')
         suborTest.write(CardNumber + " " + dateCard.replace("/","")[:4] + " " + CVV + " " + str(Amount))
-        kartySubor = open("karty.txt","r+")
-        kartyriadok = kartySubor.readline()
-        for i in range(int(kartyriadok)):
-            if (CardNumber in kartyriadok):
-                print("date: " + kartyriadok[kartyriadok.find(";",10)+1:kartyriadok.find(";",10)+5])
-            kartyriadok = kartySubor.readline()
+        getCardID()
+        #transactionSuccessful()
     elif(len(entryAmount.get())==0):
         print("transcation failed")
         canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50" ,font="Arial 14", anchor="w", fill="red")
@@ -309,9 +342,11 @@ def enableEntries():
     buttonPayment.config(state='normal')
 
 def everythingIsDone():
+    global dateCard
     enableEntries()
     entryCVVcard.delete(0,"end")
     canvas.delete("correctInfoTag")
+    dateCard = ""
     backBtn()
     
 def transactionSuccessful():
@@ -321,13 +356,68 @@ def transactionSuccessful():
     canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
     canvas.create_text(650,630,text="Transakcia bola úspešná.",font="Helvetica 18")
     canvas.create_text(650,660,text="Budete presmerovaný na hlavnú stránku.",font="Helvetica 18")
-    everythingIsDone()
-    waiting() ##TODO TIMER
+    canvas.after(4000,everythingIsDone)
+    
+def getCardID():
+    global cardID, kartyriadok
+    while not (os.path.exists("KARTY_LOCK.txt")):
+        kartyLockSubor = open("KARTY_LOCK.txt","w+")
+        kartySubor = open("KARTY.txt","r+")
+        kartyriadok = kartySubor.readline()
+        print(kartyriadok)
+        print("test 2 ")
+        for i in range (int(kartyriadok)):
+            print("test for loop")
+            kartyriadok = kartySubor.readline()
+            if (int(kartyriadok.split(";")[3])==int(CardNumber.replace(" ",""))):
+                print("Found a match, checking CVV and date")
+                if (int(kartyriadok.split(";")[4])==int(dateCard.replace("/","")[:4])):
+                    print("Card number and expiry date are correct")
+                    if (int(kartyriadok.split(";")[5])==int(CVV)):
+                        print("Everything is correct")
+                        kartyLockSubor.close()
+                        os.remove("KARTY_LOCK.txt")
+                        cardID = int(kartyriadok.split(";")[0])
+                        kartySubor.close()
+                        transactionSuccessful()
+                        return True
+
+                    else:
+                        print("wrong expiry date")
+                        enableEntries()
+                        canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
+                        canvas.after_cancel(timer)
+                        kartyLockSubor.close()
+                        os.remove("KARTY_LOCK.txt")
+                        kartySubor.close()
+                        return
+                        
+
+
+                else:
+                    print("wrong expiry date")
+                    enableEntries()
+                    canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
+                    canvas.after_cancel(timer)
+                    kartyLockSubor.close()
+                    os.remove("KARTY_LOCK.txt")
+                    kartySubor.close()
+                    return
+                    
+                    
+        
+
+            
+        print("wrong number")
+        enableEntries()
+        canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
+        canvas.after_cancel(timer)
+        kartyLockSubor.close()
+        os.remove("KARTY_LOCK.txt")
+        kartySubor.close()       
+        break
     
 
-def waiting():
-    canvas.after(4000)
-    
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
