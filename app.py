@@ -310,7 +310,7 @@ def transaction():
         #transactionSuccessful()
     elif(len(entryAmount.get())==0):
         print("transcation failed")
-        canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50" ,font="Arial 14", anchor="w", fill="red")
+        canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50 €" ,font="Arial 14", anchor="w", fill="red")
      
 
 
@@ -360,7 +360,9 @@ def transactionSuccessful():
     
 def getCardID():
     global cardID, kartyriadok
-    while not (os.path.exists("KARTY_LOCK.txt")):
+    if (os.path.exists("KARTY_LOCK.txt")):
+        canvas.after(2000,getCardID)
+    elif(os.path.exists("KARTY_LOCK.txt")==False):
         kartyLockSubor = open("KARTY_LOCK.txt","w+")
         kartySubor = open("KARTY.txt","r+")
         kartyriadok = kartySubor.readline()
@@ -374,13 +376,24 @@ def getCardID():
                 if (int(kartyriadok.split(";")[4])==int(dateCard.replace("/","")[:4])):
                     print("Card number and expiry date are correct")
                     if (int(kartyriadok.split(";")[5])==int(CVV)):
-                        print("Everything is correct")
-                        kartyLockSubor.close()
-                        os.remove("KARTY_LOCK.txt")
-                        cardID = int(kartyriadok.split(";")[0])
-                        kartySubor.close()
-                        transactionSuccessful()
-                        return True
+                        if (int(kartyriadok.split(";")[8])==0):
+                            print("Everything is correct")
+                            kartyLockSubor.close()
+                            os.remove("KARTY_LOCK.txt")
+                            cardID = int(kartyriadok.split(";")[0])
+                            kartySubor.close()
+                            transactionSuccessful()
+                            return True
+                        elif(int(kartyriadok.split(";")[8])==1):
+                            print("blocked card")
+                            enableEntries()
+                            canvas.create_text(650,630,text="Vaša karta je zablokovaná.",font="Arial 14",fill="red")
+                            canvas.after_cancel(timer)
+                            kartyLockSubor.close()
+                            os.remove("KARTY_LOCK.txt")
+                            kartySubor.close()
+                            return
+                            
 
                     else:
                         print("wrong expiry date")
@@ -415,9 +428,8 @@ def getCardID():
         kartyLockSubor.close()
         os.remove("KARTY_LOCK.txt")
         kartySubor.close()       
-        break
+        
     
-
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
