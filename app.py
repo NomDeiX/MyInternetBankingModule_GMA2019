@@ -36,7 +36,8 @@ continueProcess=0
 cardID = 0
 
 kartyriadok = 0
-
+kartyLockSubor = 0
+notEnoughFunds=False
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
     print("MENU SCREEN")
@@ -359,7 +360,7 @@ def transactionSuccessful():
     canvas.after(4000,everythingIsDone)
     
 def getCardID():
-    global cardID, kartyriadok
+    global cardID, kartyriadok, kartyLockSubor,notEnoughFunds
     if (os.path.exists("KARTY_LOCK.txt")):
         canvas.after(2000,getCardID)
     elif(os.path.exists("KARTY_LOCK.txt")==False):
@@ -367,7 +368,6 @@ def getCardID():
         kartySubor = open("KARTY.txt","r+")
         kartyriadok = kartySubor.readline()
         print(kartyriadok)
-        print("test 2 ")
         for i in range (int(kartyriadok)):
             print("test for loop")
             kartyriadok = kartySubor.readline()
@@ -377,21 +377,24 @@ def getCardID():
                     print("Card number and expiry date are correct")
                     if (int(kartyriadok.split(";")[5])==int(CVV)):
                         if (int(kartyriadok.split(";")[8])==0):
-                            print("Everything is correct")
-                            kartyLockSubor.close()
-                            os.remove("KARTY_LOCK.txt")
-                            cardID = int(kartyriadok.split(";")[0])
-                            kartySubor.close()
-                            transactionSuccessful()
-                            return True
+                            creditOrDebet()
+                            if (notEnoughFunds==False):
+                                print("Everything is correct")
+                                cardID = int(kartyriadok.split(";")[0])
+                                kartySubor.close()
+                                kartyLockSubor.close()
+                                os.remove("KARTY_LOCK.txt")
+                                transactionSuccessful()
+                                return True
+                            notEnoughFunds = False
                         elif(int(kartyriadok.split(";")[8])==1):
                             print("blocked card")
                             enableEntries()
                             canvas.create_text(650,630,text="Vaša karta je zablokovaná.",font="Arial 14",fill="red")
                             canvas.after_cancel(timer)
+                            kartySubor.close()
                             kartyLockSubor.close()
                             os.remove("KARTY_LOCK.txt")
-                            kartySubor.close()
                             return
                             
 
@@ -400,9 +403,9 @@ def getCardID():
                         enableEntries()
                         canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
                         canvas.after_cancel(timer)
+                        kartySubor.close()
                         kartyLockSubor.close()
                         os.remove("KARTY_LOCK.txt")
-                        kartySubor.close()
                         return
                         
 
@@ -412,24 +415,62 @@ def getCardID():
                     enableEntries()
                     canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
                     canvas.after_cancel(timer)
+                    kartySubor.close()
                     kartyLockSubor.close()
                     os.remove("KARTY_LOCK.txt")
-                    kartySubor.close()
                     return
                     
                     
         
 
-            
-        print("wrong number")
-        enableEntries()
-        canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
-        canvas.after_cancel(timer)
-        kartyLockSubor.close()
-        os.remove("KARTY_LOCK.txt")
-        kartySubor.close()       
+        try:    
+            kartySubor.close() 
+            kartyLockSubor.close()
+            os.remove("KARTY_LOCK.txt")
+            print("wrong number")
+            enableEntries()
+            canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
+            canvas.after_cancel(timer)
+        except OSError:
+            print("probably already done")
         
-    
+def creditOrDebet():
+    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds
+    if (kartyriadok.split(";")[2]=="D"):
+        print("debet card")
+        if (os.path.exists("UCTY_LOCK.txt")):
+            canvas.after(2000,creditOrDebet)
+        elif(os.path.exists("UCTY_LOCK.txt")==False):
+            uctyLockSubor = open("UCTY_LOCK.txt","w+")
+            uctySubor = open("UCTY.txt","r+")
+            uctyriadok = uctySubor.readline()
+            for i in range (int(uctyriadok)):
+                uctyriadok = uctySubor.readline()
+                print("kartove: " + kartyriadok.split(";")[6])
+                print("uctove: " + uctyriadok.split(";")[0])
+                if(kartyriadok.split(";")[6]==uctyriadok.split(";")[0]):
+                    if (Amount<=float(uctyriadok.split(";")[4])):
+                        print("Suma je mensia ako zostatok")
+                    elif(Amount>float(uctyriadok.split(";")[4])):
+                        print("Nemate dostatok penazi na ucte")
+                        notEnoughFunds=True
+                        enableEntries()
+                        canvas.create_text(650,630,text="Na Vašom účte sa nenachádza dostatok finančných prostriedkov.",font="Arial 14",fill="red")
+                        canvas.after_cancel(timer)
+                        break          
+            uctySubor.close()
+            uctyLockSubor.close()
+            os.remove("UCTY_LOCK.txt")
+            try:
+                kartyLockSubor.close()
+                os.remove("KARTY_LOCK.txt")
+            except :
+                print("karty lock was probably already deleted")
+    elif(kartyriadok.split(";")[2]=="K"):
+        print("credit card")    
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
+
+
+      
