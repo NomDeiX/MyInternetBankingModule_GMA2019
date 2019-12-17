@@ -37,7 +37,13 @@ cardID = 0
 
 kartyriadok = 0
 kartyLockSubor = 0
+uctyriadok=0
+uctyLockSubor=0
 notEnoughFunds=False
+
+##data  potrebne do suborov
+obchonikID = 0
+
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
     print("MENU SCREEN")
@@ -48,7 +54,7 @@ def menuScreen():
     entryID = tkinter.Entry(width=30,font = "Helvetica 15 bold")
     entryID.pack()
     entryID.place(x=1/2*w + 200,y=h-(0.62*h),height=30)
-    buttonPrihlasit = tkinter.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=paymentScreen)
+    buttonPrihlasit = tkinter.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=getObchodnikID)
     buttonPrihlasit.pack()
     buttonPrihlasit.place(x=1/2*w,y=h-(0.4*h))
     menuImg = tkinter.PhotoImage(master=canvas,file='obrazky/menu.png')
@@ -57,7 +63,36 @@ def menuScreen():
     labelMenuImg.pack()
     labelMenuImg.place(x=0.03*w,y=h-(0.55*h), anchor="w")
     canvas.delete("correctInfoTag")
-    
+
+def getObchodnikID():
+    global entryID,uctyLockSubor,uctyriadok
+    if(entryID.get()==""):
+        print("wooong")
+    elif(len(entryID.get())>0 and entryID.get().isdigit()==True):
+        obchodnikID=int(entryID.get())
+        if(os.path.exists("UCTY_LOCK.txt")):
+            canvas.after(2000,getObchodnikID)
+        elif(os.path.exists("UCTY_LOCK.txt")==False):
+            uctyLockSubor = open("UCTY_LOCK.txt", "w+")
+            uctySubor=open("UCTY.txt", "r+")
+            uctyriadok=uctySubor.readline()
+            for i in range(int(uctyriadok)):
+                uctyriadok=uctySubor.readline()
+                print(int(uctyriadok.split(";")[0]))
+                if(obchodnikID==int(uctyriadok.split(";")[0])):
+                    print("found a match, obchodnik ID ("+str(obchodnikID)+") is registerred")
+                    paymentScreen()
+                    uctySubor.close()
+                    uctyLockSubor.close()
+                    os.remove("UCTY_LOCK.txt")   
+                    return
+                else:
+                    print("not found")
+                    canvas.create_text((1/2*w,h-(0.55*h)),text="ID obchodnika nie je v databaze",font="Arial  14",fill="red", anchor="w")
+            uctySubor.close()
+            uctyLockSubor.close()
+            os.remove("UCTY_LOCK.txt")     
+                
 def paymentScreen():
     global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
     checkObchodnik()
@@ -138,10 +173,11 @@ def whatsCVVScreen(event):
         cvvSwitch = False
 
 def backBtn():
-    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg,creditCardImg,IDobchodnik
+    global entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,cvvLabel,labelCreditCardImg,creditCardImg,IDobchodnik,CVV,dateCard,CardNumber
     canvas.delete("all")
     entryCardNum.destroy()
     entryDateCard.destroy()
+    entryCVVcard.delete(0,"end")
     entryCVVcard.destroy()
     entryAmount.destroy()
     buttonPayment.destroy()
@@ -151,10 +187,11 @@ def backBtn():
     labelCreditCardImg.config(image='',width=1)
     labelCreditCardImg.destroy()
     IDobchodnik = ""
-    menuScreen()
     CardNumber=""
     dateCard=""
     CVV=""
+    menuScreen()
+
 
 def validateAll(event):
     print("click")
@@ -468,6 +505,7 @@ def creditOrDebet():
                 print("karty lock was probably already deleted")
     elif(kartyriadok.split(";")[2]=="K"):
         print("credit card")    
+
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
