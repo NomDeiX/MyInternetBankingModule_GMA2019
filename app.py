@@ -420,7 +420,10 @@ def getCardID():
                                 cardID = int(kartyriadok.split(";")[0])
                                 kartySubor.close()
                                 kartyLockSubor.close()
-                                os.remove("KARTY_LOCK.txt")
+                                try:
+                                    os.remove("KARTY_LOCK.txt")
+                                except OSError:
+                                    print("probably already deleted")
                                 transactionSuccessful()
                                 return True
                             notEnoughFunds = False
@@ -436,7 +439,7 @@ def getCardID():
                             
 
                     else:
-                        print("wrong expiry date")
+                        print("wrong CVV")
                         enableEntries()
                         canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
                         canvas.after_cancel(timer)
@@ -483,16 +486,14 @@ def creditOrDebet():
             uctyriadok = uctySubor.readline()
             for i in range (int(uctyriadok)):
                 uctyriadok = uctySubor.readline()
-                print("kartove: " + kartyriadok.split(";")[6])
-                print("uctove: " + uctyriadok.split(";")[0])
                 if(kartyriadok.split(";")[6]==uctyriadok.split(";")[0]):
-                    if (Amount<=float(uctyriadok.split(";")[4])):
+                    if (Amount<=float(uctyriadok.split(";")[4]) and Amount<=float(kartyriadok.split(";")[9])):
                         print("Suma je mensia ako zostatok")
-                    elif(Amount>float(uctyriadok.split(";")[4])):
+                    elif(Amount>float(kartyriadok.split(";")[9])):
                         print("Nemate dostatok penazi na ucte")
                         notEnoughFunds=True
                         enableEntries()
-                        canvas.create_text(650,630,text="Na Vašom účte sa nenachádza dostatok finančných prostriedkov.",font="Arial 14",fill="red")
+                        canvas.create_text(650,630,text="Na Vašom účte sa nenachádza dostatok finančných prostriedkov alebo nizky limit.",font="Arial 14",fill="red")
                         canvas.after_cancel(timer)
                         break          
             uctySubor.close()
@@ -505,10 +506,32 @@ def creditOrDebet():
                 print("karty lock was probably already deleted")
     elif(kartyriadok.split(";")[2]=="K"):
         print("credit card")    
-
+        if (os.path.exists("UCTY_LOCK.txt")):
+            canvas.after(2000,creditOrDebet)
+        elif(os.path.exists("UCTY_LOCK.txt")==False):
+            uctyLockSubor = open("UCTY_LOCK.txt","w+")
+            uctySubor = open("UCTY.txt","r+")
+            uctyriadok = uctySubor.readline()
+            for i in range (int(uctyriadok)):
+                uctyriadok = uctySubor.readline()
+                if(kartyriadok.split(";")[6]==uctyriadok.split(";")[0]):
+                    if(Amount+float(kartyriadok.split(";")[7])<=float(kartyriadok.split(";")[9])):
+                        print("Sedi")
+                    elif(Amount+float(kartyriadok.split(";")[7])>float(kartyriadok.split(";")[9])):
+                        print("Nizky limit")
+                        notEnoughFunds=True
+                        enableEntries()
+                        canvas.create_text(650,630,text="Na Vašom účte je nizky limit",font="Arial 14",fill="red")
+                        canvas.after_cancel(timer)
+                        break
+            uctySubor.close()
+            uctyLockSubor.close()
+            os.remove("UCTY_LOCK.txt")
+            try:
+                kartyLockSubor.close()
+                os.remove("KARTY_LOCK.txt")
+            except :
+                print("karty lock was probably already deleted")
 
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
-
-
-      
