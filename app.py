@@ -515,9 +515,9 @@ def creditOrDebet():
             for i in range (int(uctyriadok)):
                 uctyriadok = uctySubor.readline()
                 if(kartyriadok.split(";")[6]==uctyriadok.split(";")[0]):
-                    if(Amount+float(kartyriadok.split(";")[7])<=float(kartyriadok.split(";")[9])):
+                    if(Amount+float(kartyriadok.split(";")[7])<=float(kartyriadok.split(";")[10])):
                         print("Sedi")
-                    elif(Amount+float(kartyriadok.split(";")[7])>float(kartyriadok.split(";")[9])):
+                    elif(Amount+float(kartyriadok.split(";")[7])>float(kartyriadok.split(";")[10])):
                         print("Nizky limit")
                         notEnoughFunds=True
                         enableEntries()
