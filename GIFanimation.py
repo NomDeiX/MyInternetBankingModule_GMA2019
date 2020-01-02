@@ -1,17 +1,34 @@
-from tkinter import *
+import tkinter
+w = 1280
+h = 720
+canvas = tkinter.Canvas(width=w,height=h,bg="#71CAE7")
+canvas.pack()
+from random import *
+import datetime
 import time
 import os
-root = Tk()
 
-frames = [PhotoImage(file='obrazky/source.gif',format = 'gif -index %i' %(i)) for i in range(25)]
 
-def update(ind):
+num = 0
+arr = []
+subor = open("TRANSAKCIE_PAYWALL.txt", "a+")
+subor.seek(0)
 
-    frame = frames[ind]
-    ind += 1
-    label.configure(image=frame)
-    root.after(100, update, ind)
-label = Label(root)
-label.pack()
-root.after(0, update, 0)
-root.mainloop()
+
+num = subor.readline().strip()
+for i in range (int(num)):
+    riadok = subor.readline()
+    arr.append(riadok.strip())
+
+
+
+def newfile():
+    global num, arr,subor
+    subor.close()
+    novysubor = open("TRANSAKCIE_PAYWALL.txt", "w+")
+    novysubor.write(str(int(num)+1))
+    for i in range (len(arr)):
+        novysubor.write("\n" + arr[i])
+    novysubor.write("\n" + "nieconieconieco")
+
+
