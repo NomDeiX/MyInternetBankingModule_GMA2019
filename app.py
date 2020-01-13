@@ -275,9 +275,10 @@ def validateCardNumber():
 def validateDate():
     global entryDateCard,dateCard
     if (len(entryDateCard.get())==5):
-        entryDateCard.insert(0,dateCard)
+        print("")
+##        entryDateCard.insert(0,dateCard)
     dateCard = entryDateCard.get()
-    if (2<=len(entryDateCard.get())<=4 and (entryDateCard.get().find("/")!=2)):  ## NEFUNGUJE KURNIIIIK
+    if (2<=len(entryDateCard.get())<=4 and (entryDateCard.get().find("/")!=2) and ("/" not in entryDateCard.get())):  ## NEFUNGUJE KURNIIIIK
         dateCard.replace("/","")
         entryDateCard.delete(0,"end")
         entryDateCard.insert(0,dateCard)
@@ -286,6 +287,8 @@ def validateDate():
         entryDateCard.delete(0,"end")
         entryDateCard.insert(0,dateCard[:5])
         dateCard = dateCard[:5]
+    if(entryDateCard.get()[:2].isdigit() == True and "/" in entryDateCard.get()):
+        print("no more change")
 
 
 def errorCreditInfo():
