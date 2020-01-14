@@ -559,6 +559,7 @@ def transakciePaywall():
     transakcieKarty()
     num = 0
     arr = []
+    datum = datetime.date.today().strftime('%d%m%Y')
     if (os.path.exists("TRANSAKCIE_PAYWALL_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
     elif(os.path.exists("TRANSAKCIE_PAYWALL_LOCK.txt")==False):
@@ -574,7 +575,7 @@ def transakciePaywall():
         novysubor.write(str(int(num)+1))
         for i in range (len(arr)):
             novysubor.write("\n" + arr[i])
-        novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment))
+        novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
         if (successfulPayment==1):
             successfulPayment=0
         novysubor.close()
