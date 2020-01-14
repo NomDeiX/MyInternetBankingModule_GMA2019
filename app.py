@@ -33,7 +33,7 @@ IDobchodnik = 0
 casGIF = 0
 timer=0
 continueProcess=0
-cardID = 0
+
 
 kartyriadok = 0
 kartyLockSubor = 0
@@ -44,6 +44,7 @@ notEnoughFunds=False
 ##data  potrebne do suborov
 obchodnikID = 0
 successfulPayment=0
+cardID = 0
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -559,7 +560,7 @@ def transakciePaywall():
         novysubor.write(str(int(num)+1))
         for i in range (len(arr)):
             novysubor.write("\n" + arr[i])
-        novysubor.write("\n" + str(int(num)+1)+";"+ "neviemIDkary" +";"+str(Amount)+";"+"neviemIDklienta"+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment))
+        novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+"neviemIDklienta"+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment))
         if (successfulPayment==1):
             successfulPayment=0
         novysubor.close()
