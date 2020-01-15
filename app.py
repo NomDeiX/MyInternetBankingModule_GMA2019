@@ -432,8 +432,8 @@ def getCardID():
                                 cardID = int(kartyriadok.split(";")[0])
                                 kartySubor.close()
                                 kartyLockSubor.close()
-                                transakciePaywall()
                                 successfulPayment=1
+                                transakciePaywall()     
                                 try:
                                     os.remove("KARTY_LOCK.txt")
                                 except OSError:
@@ -602,6 +602,7 @@ def resetPaywallVariables():
 
 
 def transakcieKarty():
+    global cardID, Amount, obchodnikID
     numTK = 0
     arrTK = []
     if (os.path.exists("TRANSAKCIE_KARTY_LOCK.txt")):
@@ -625,10 +626,12 @@ def transakcieKarty():
         os.remove("TRANSAKCIE_KARTY_LOCK.txt")
 
 def transakcieUcty():
-    global Amount, successfulPayment, obchodnikID, klientID, cardID
+    global Amount, successfulPayment, obchodnikID, klientID, cardID, ucetID
     numTU = 0
     arrTU = []
     datum = datetime.date.today().strftime('%d%m%Y')
+    typ="K/D/C"
+    sposob = "H/P"
     if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
     elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
@@ -644,7 +647,7 @@ def transakcieUcty():
         novyTUsubor.write(str(int(numTU)+1))
         for i in range (len(arrTU)):
             novyTUsubor.write("\n" + arrTU[i])
-        novyTUsubor.write("\n" + str(int(numTU)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
+        novyTUsubor.write("\n" + str(int(numTU)+1)+";"+ str(typ) +";"+str(sposob)+";"+str(klientID)+";"+str(ucetID)+";"+str(Amount)+";"+str(datum))
         novyTUsubor.close()
         lockTUsubor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")    
