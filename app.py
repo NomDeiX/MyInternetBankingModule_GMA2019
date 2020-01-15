@@ -489,7 +489,7 @@ def getCardID():
             print("probably already done")
         
 def creditOrDebet():
-    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID
+    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID, uctyriadok
     if (kartyriadok.split(";")[2]=="D"):
         print("debet card")
         if (os.path.exists("UCTY_LOCK.txt")):
@@ -505,7 +505,8 @@ def creditOrDebet():
                         print("Suma je mensia ako zostatok")
                         print("nasiel som klient ID: " + uctyriadok.split(";")[1])
                         klientID = uctyriadok.split(";")[1]
-                    elif(Amount>float(kartyriadok.split(";")[10])):
+                    elif(Amount>float(kartyriadok.split(";")[10]) or Amount>float(uctyriadok.split(";")[4])):
+                        #print ("Amount: " + str(Amount) + " + kartyriadoksplit10 " + str(kartyriadok.split(";")[10]) + " is less/more")
                         print("Nemate dostatok penazi na ucte")
                         notEnoughFunds=True
                         enableEntries()
@@ -531,11 +532,11 @@ def creditOrDebet():
             for i in range (int(uctyriadok)):
                 uctyriadok = uctySubor.readline()
                 if(kartyriadok.split(";")[6]==uctyriadok.split(";")[0]):
-                    if(Amount+float(kartyriadok.split(";")[7])<=float(kartyriadok.split(";")[9])):
+                    if(Amount+float(kartyriadok.split(";")[7])<=float(kartyriadok.split(";")[10])):
                         print("Sedi")
                         print("nasiel som klient ID: " + uctyriadok.split(";")[1])
                         klientID = uctyriadok.split(";")[1]
-                    elif(Amount+float(kartyriadok.split(";")[7])>float(kartyriadok.split(";")[9])):
+                    elif(Amount+float(kartyriadok.split(";")[7])>float(kartyriadok.split(";")[10])):
                         print("Nizky limit")
                         notEnoughFunds=True
                         enableEntries()
