@@ -432,8 +432,8 @@ def getCardID():
                                 cardID = int(kartyriadok.split(";")[0])
                                 kartySubor.close()
                                 kartyLockSubor.close()
-                                successfulPayment=1
                                 transakciePaywall()
+                                successfulPayment=1
                                 try:
                                     os.remove("KARTY_LOCK.txt")
                                 except OSError:
@@ -444,6 +444,7 @@ def getCardID():
                         elif(int(kartyriadok.split(";")[8])==1):
                             print("blocked card")
                             enableEntries()
+                            transakciePaywall()
                             canvas.create_text(650,630,text="Vaša karta je zablokovaná.",font="Arial 14",fill="red")
                             canvas.after_cancel(timer)
                             kartySubor.close()
@@ -455,6 +456,7 @@ def getCardID():
                     else:
                         print("wrong CVV")
                         enableEntries()
+                        transakciePaywall()
                         canvas.create_text((w//2)+75,h-(0.53*h),text="Nesprávny CVV kod" ,font="Arial 14", anchor="w", fill="red")
                         canvas.after_cancel(timer)
                         kartySubor.close()
@@ -467,6 +469,7 @@ def getCardID():
                 else:
                     print("wrong expiry date")
                     enableEntries()
+                    transakciePaywall()
                     canvas.create_text((w//2)-275,h-(0.53*h),text="Nesprávny alebo expirovaný dátum" ,font="Arial 14", anchor="w", fill="red")
                     canvas.after_cancel(timer)
                     kartySubor.close()
@@ -483,6 +486,7 @@ def getCardID():
             os.remove("KARTY_LOCK.txt")
             print("wrong number")
             enableEntries()
+            transakciePaywall()
             canvas.create_text((w//2)-275,h-(0.7*h),text="Neplatné číslo karty" ,font="Arial 14", anchor="w", fill="red")
             canvas.after_cancel(timer)
         except OSError:
@@ -510,6 +514,7 @@ def creditOrDebet():
                         print("Nemate dostatok penazi na ucte")
                         notEnoughFunds=True
                         enableEntries()
+                        transakciePaywall()
                         canvas.create_text(650,630,text="Na Vašom účte sa nenachádza dostatok finančných prostriedkov alebo nizky limit.",font="Arial 14",fill="red")
                         canvas.after_cancel(timer)
                         break          
@@ -540,6 +545,7 @@ def creditOrDebet():
                         print("Nizky limit")
                         notEnoughFunds=True
                         enableEntries()
+                        transakciePaywall()
                         canvas.create_text(650,630,text="Na Vašom účte je nizky limit",font="Arial 14",fill="red")
                         canvas.after_cancel(timer)
                         break
@@ -578,6 +584,7 @@ def transakciePaywall():
             novysubor.write("\n" + arr[i])
         novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
         if (successfulPayment==1):
+            transakcieUcty()
             successfulPayment=0
         novysubor.close()
         locksubor.close()
@@ -616,6 +623,31 @@ def transakcieKarty():
         novyTKsubor.close()
         lockTKsubor.close()
         os.remove("TRANSAKCIE_KARTY_LOCK.txt")
+
+def transakcieUcty():
+    global Amount, successfulPayment, obchodnikID, klientID, cardID
+    numTU = 0
+    arrTU = []
+    datum = datetime.date.today().strftime('%d%m%Y')
+    if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
+            canvas.after(2000,creditOrDebet)
+    elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
+        lockTUsubor = open("TRANSAKCIE_UCTY_LOCK.txt","w+")
+        staryTUsubor = open("TRANSAKCIE_UCTY.txt", "a+")
+        staryTUsubor.seek(0)
+        numTU = staryTUsubor.readline().strip()
+        for i in range (int(numTU)):
+            riadokTU = staryTUsubor.readline()
+            arrTU.append(riadokTU.strip())
+        staryTUsubor.close()
+        novyTUsubor = open("TRANSAKCIE_UCTY.txt", "w+")
+        novyTUsubor.write(str(int(numTU)+1))
+        for i in range (len(arrTU)):
+            novyTUsubor.write("\n" + arrTU[i])
+        novyTUsubor.write("\n" + str(int(numTU)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
+        novyTUsubor.close()
+        lockTUsubor.close()
+        os.remove("TRANSAKCIE_UCTY_LOCK.txt")    
     
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
