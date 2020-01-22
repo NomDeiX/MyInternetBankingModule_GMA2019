@@ -47,6 +47,10 @@ successfulPayment=0
 cardID = 0
 ucetID = 0
 klientID = 0
+obchodnikUcet=0
+receiverDebetKredit=""
+senderDebetKredit=""
+
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -69,7 +73,7 @@ def menuScreen():
     canvas.delete("correctInfoTag")
 
 def getObchodnikID():
-    global entryID,uctyLockSubor,uctyriadok,obchodnikID
+    global entryID,uctyLockSubor,uctyriadok,obchodnikID, obchodnikUcet
     if(entryID.get()==""):
         print("wooong")
     elif(len(entryID.get())>0 and entryID.get().isdigit()==True):
@@ -84,7 +88,8 @@ def getObchodnikID():
                 uctyriadok=uctySubor.readline()
                 print(int(uctyriadok.split(";")[0]))
                 if(obchodnikID==int(uctyriadok.split(";")[0])):
-                    print("found a match, obchodnik ID ("+str(obchodnikID)+") is registerred")
+                    obchodnikUcet=int(uctyriadok.split(";")[1])
+                    print("found a match, obchodnik ID ("+str(obchodnikID)+") is registerred, obchodnikUcet is" + str(obchodnikUcet))
                     paymentScreen()
                     uctySubor.close()
                     uctyLockSubor.close()
@@ -493,9 +498,10 @@ def getCardID():
             print("probably already done")
         
 def creditOrDebet():
-    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID, uctyriadok
+    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID, uctyriadok, obchodnikUcet, receiverDebetKredit
     if (kartyriadok.split(";")[2]=="D"):
         print("debet card")
+        receiverDebetKredit="Debet"
         if (os.path.exists("UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
         elif(os.path.exists("UCTY_LOCK.txt")==False):
@@ -527,7 +533,8 @@ def creditOrDebet():
             except :
                 print("karty lock was probably already deleted")
     elif(kartyriadok.split(";")[2]=="K"):
-        print("credit card")    
+        print("credit card")
+        receiverDebetKredit = "Kredit"
         if (os.path.exists("UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
         elif(os.path.exists("UCTY_LOCK.txt")==False):
@@ -582,7 +589,19 @@ def transakciePaywall():
         novysubor.write(str(int(num)+1))
         for i in range (len(arr)):
             novysubor.write("\n" + arr[i])
-        novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+"coto je id transakcie"+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
+        if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
+            canvas.after(2000,transakciePaywall)
+        elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
+            docasnyFile = open("TRANSAKCIE_UCTY.txt", "r")
+            docasnyLockFile = open("TRANSAKCIE_UCTY_LOCK.txt", "w")
+            if (successfulPayment==1):
+                idtransakcie = int(docasnyFile.readline())
+            elif(successfulPayment!=1):
+                idtransakcie = 0
+            novysubor.write("\n" + str(int(num)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+str(idtransakcie)+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
+            docasnyFile.close()
+            docasnyLockFile.close()
+            os.remove("TRANSAKCIE_UCTY_LOCK.txt")   
         if (successfulPayment==1):
             transakcieUcty()
             successfulPayment=0
@@ -626,12 +645,10 @@ def transakcieKarty():
         os.remove("TRANSAKCIE_KARTY_LOCK.txt")
 
 def transakcieUcty():
-    global Amount, successfulPayment, obchodnikID, klientID, cardID, ucetID
+    global Amount, successfulPayment, obchodnikID, klientID, cardID, ucetID, obchodnikID, obchodnikUcet
     numTU = 0
     arrTU = []
     datum = datetime.date.today().strftime('%d%m%Y')
-    typ="K/D/C"
-    sposob = "H/P"
     if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
     elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
@@ -644,13 +661,22 @@ def transakcieUcty():
             arrTU.append(riadokTU.strip())
         staryTUsubor.close()
         novyTUsubor = open("TRANSAKCIE_UCTY.txt", "w+")
-        novyTUsubor.write(str(int(numTU)+1))
+        novyTUsubor.write(str(int(numTU)+2))
         for i in range (len(arrTU)):
             novyTUsubor.write("\n" + arrTU[i])
-        novyTUsubor.write("\n" + str(int(numTU)+1)+";"+ str(typ) +";"+str(sposob)+";"+str(klientID)+";"+str(ucetID)+";"+str(Amount)+";"+str(datum))
+        novyTUsubor.write("\n" + str(int(numTU)+1)+";"+ "C" +";"+"P"+";"+str(klientID)+";"+str(ucetID)+";"+"-"+str(Amount)+";"+str(int(numTU)+2)+";"+str(datum))
+        novyTUsubor.write("\n" + str(int(numTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum))
         novyTUsubor.close()
         lockTUsubor.close()
         os.remove("TRANSAKCIE_UCTY_LOCK.txt")    
+
+def moneyTransfer():
+    global receiver
+    if (receiverDebetKredit=="Debet"):
+        print(".")
+        
+        
     
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
+
