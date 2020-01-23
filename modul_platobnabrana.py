@@ -498,10 +498,10 @@ def getCardID():
             print("probably already done")
         
 def creditOrDebet():
-    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID, uctyriadok, obchodnikUcet, receiverDebetKredit
+    global kartyriadok, Amount,kartyLockSubor,notEnoughFunds, ucetID, klientID, uctyriadok, obchodnikUcet, senderDebetKredit
     if (kartyriadok.split(";")[2]=="D"):
         print("debet card")
-        receiverDebetKredit="Debet"
+        senderDebetKredit="Debet"
         if (os.path.exists("UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
         elif(os.path.exists("UCTY_LOCK.txt")==False):
@@ -534,7 +534,7 @@ def creditOrDebet():
                 print("karty lock was probably already deleted")
     elif(kartyriadok.split(";")[2]=="K"):
         print("credit card")
-        receiverDebetKredit = "Kredit"
+        senderDebetKredit = "Kredit"
         if (os.path.exists("UCTY_LOCK.txt")):
             canvas.after(2000,creditOrDebet)
         elif(os.path.exists("UCTY_LOCK.txt")==False):
@@ -611,14 +611,17 @@ def transakciePaywall():
         
 
 def resetPaywallVariables():
-    global ucetID
+    global ucetID, obchodnikID, successfulPayment, cardID, obchodnikUcet,senderDebetKredit,receiverDebetKredit
     obchodnikID = 0
     successfulPayment=0
     cardID = 0
     ucetID = 0
     klientID = 0
+    obchodnikUcet=0
+    receiverDebetKredit=""
+    senderDebetKredit=""
 
-
+    
 
 def transakcieKarty():
     global cardID, Amount, obchodnikID
@@ -646,6 +649,7 @@ def transakcieKarty():
 
 def transakcieUcty():
     global Amount, successfulPayment, obchodnikID, klientID, cardID, ucetID, obchodnikID, obchodnikUcet
+    moneyTransfer()
     numTU = 0
     arrTU = []
     datum = datetime.date.today().strftime('%d%m%Y')
@@ -668,15 +672,63 @@ def transakcieUcty():
         novyTUsubor.write("\n" + str(int(numTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum))
         novyTUsubor.close()
         lockTUsubor.close()
-        os.remove("TRANSAKCIE_UCTY_LOCK.txt")    
+        os.remove("TRANSAKCIE_UCTY_LOCK.txt")
+    
 
 def moneyTransfer():
-    global receiver
-    if (receiverDebetKredit=="Debet"):
-        print(".")
-        
+    global senderDebetKredit, Amount, klientID, obchodnikID
+    arrDebet=[]
+    if (senderDebetKredit=="Debet"):
+        print("removing " + str(Amount) + " from his account")
+        if (os.path.exists("UCTY_LOCK.txt")):
+            canvas.after(2000,creditOrDebet)
+        elif(os.path.exists("UCTY_LOCK.txt")==False):
+            uctyLockSubor = open("UCTY_LOCK.txt","w+")
+            uctySubor = open("UCTY.txt","r+")
+            uctyriadok = uctySubor.readline()
+            pocetriadkov = int(uctyriadok)
+            for i in range (int(uctyriadok)):
+                uctyriadok = uctySubor.readline()
+                arrDebet.append(uctyriadok)
+            print(arrDebet)
+            uctySubor.seek(0)
+            uctySubor.truncate()
+            uctySubor.write(str(pocetriadkov)+"\n")
+            for i in range(len(arrDebet)):
+                if(int(arrDebet[i].split(";")[1])==int(klientID)):
+                    print("it is this one")
+                    oldSuma = arrDebet[i].split(";")[4].strip()
+                    newSuma = str(float(float(oldSuma)-float(Amount)))
+                    print("before: " + str(arrDebet[i].split(";")[4]))
+                    lengthPomocna = len(arrDebet[i].split(";")[4])
+                    if (i!=pocetriadkov):
+                        uctySubor.write(arrDebet[i][:len(arrDebet[i])-int(lengthPomocna)]+newSuma+"\n")
+                    else:
+                        uctySubor.write(arrDebet[i][:len(arrDebet[i])-int(lengthPomocna)]+newSuma)
+                    print("old suma : " + str(oldSuma) + " and new suma: " + str(newSuma))
+                    print("after: " + arrDebet[i][:len(arrDebet[i])-int(lengthPomocna)]+newSuma)
+                elif(int(arrDebet[i].split(";")[1])==int(obchodnikID)):
+                    oldSuma2 = arrDebet[i].split(";")[4].strip()
+                    newSuma2=str(float(float(oldSuma2)+float(Amount)))
+                    print("before2: " + str(arrDebet[i].split(";")[4]))
+                    lengthPomocna2 = len(arrDebet[i].split(";")[4])
+                    if (i!=pocetriadkov):
+                        uctySubor.write(arrDebet[i][:len(arrDebet[i])-int(lengthPomocna2)]+newSuma2+"\n")
+                    else:
+                        uctySubor.write(arrDebet[i][:len(arrDebet[i])-int(lengthPomocna2)]+newSuma2)
+                    print("old suma2 : " + str(oldSuma2) + " and new suma2: " + str(newSuma2))
+                    print("after2: " + arrDebet[i][:len(arrDebet[i])-int(lengthPomocna2)]+newSuma2)
+                else:
+                    uctySubor.write(arrDebet[i])
+                    
+                
+            uctySubor.close()
+            uctyLockSubor.close()
+            os.remove("UCTY_LOCK.txt")
+            
+    
+            
         
     
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
-
