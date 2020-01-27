@@ -51,6 +51,17 @@ obchodnikUcet=0
 receiverDebetKredit=""
 senderDebetKredit=""
 
+##Paths to files
+pathUcty = "UCTY.txt"
+pathUctyLock = "UCTY_LOCK.txt"
+pathKarty = "KARTY.txt"
+pathKartyLock = "KARTY_LOCK.txt"
+pathTransakciePaywall = "TRANSAKCIE_PAYWALL.txt"
+pathTransakciePaywallLock = "TRANSAKCIE_PAYWALL_LOCK.txt"
+pathTransakcieKarty = "TRANSAKCIE_KARTY.txt"
+pathTransakcieKartyLock = "TRANSAKCIE_KARTY_LOCK.txt"
+pathTransakcieUcty = "TRANSAKCIE_UCTY.txt"
+pathTransakcieUctyLock = "TRANSAKCIE_UCTY_LOCK.txt"
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -78,11 +89,11 @@ def getObchodnikID():
         print("wooong")
     elif(len(entryID.get())>0 and entryID.get().isdigit()==True):
         obchodnikID=int(entryID.get())
-        if(os.path.exists("UCTY_LOCK.txt")):
+        if(os.path.exists(pathUctyLock)):
             canvas.after(2000,getObchodnikID)
-        elif(os.path.exists("UCTY_LOCK.txt")==False):
-            uctyLockSubor = open("UCTY_LOCK.txt", "w+")
-            uctySubor=open("UCTY.txt", "r+")
+        elif(os.path.exists(pathUctyLock)==False):
+            uctyLockSubor = open(pathUctyLock, "w+")
+            uctySubor=open(pathUcty, "r+")
             uctyriadok=uctySubor.readline()
             for i in range(int(uctyriadok)):
                 uctyriadok=uctySubor.readline()
@@ -93,14 +104,14 @@ def getObchodnikID():
                     paymentScreen()
                     uctySubor.close()
                     uctyLockSubor.close()
-                    os.remove("UCTY_LOCK.txt")   
+                    os.remove(pathUctyLock)   
                     return
                 else:
                     print("not found")
                     canvas.create_text((1/2*w,h-(0.55*h)),text="ID obchodnika nie je v databaze",font="Arial  14",fill="red", anchor="w")
             uctySubor.close()
             uctyLockSubor.close()
-            os.remove("UCTY_LOCK.txt")     
+            os.remove(pathUctyLock)     
                 
 def paymentScreen():
     global w,h, entryCardNum, entryDateCard, entryCVVcard,entryAmount,buttonPayment,buttonBack, labelMenuImg, cvvLabel, sv
@@ -412,11 +423,11 @@ def transactionSuccessful():
     
 def getCardID():
     global cardID, kartyriadok, kartyLockSubor,notEnoughFunds,successfulPayment, ucetID
-    if (os.path.exists("KARTY_LOCK.txt")):
+    if (os.path.exists(pathKartyLock)):
         canvas.after(2000,getCardID)
-    elif(os.path.exists("KARTY_LOCK.txt")==False):
-        kartyLockSubor = open("KARTY_LOCK.txt","w+")
-        kartySubor = open("KARTY.txt","r+")
+    elif(os.path.exists(pathKartyLock)==False):
+        kartyLockSubor = open(pathKartyLock,"w+")
+        kartySubor = open(pathKarty,"r+")
         kartyriadok = kartySubor.readline()
         print(kartyriadok)
         for i in range (int(kartyriadok)):
@@ -438,7 +449,7 @@ def getCardID():
                                 successfulPayment=1
                                 transakciePaywall()     
                                 try:
-                                    os.remove("KARTY_LOCK.txt")
+                                    os.remove(pathKartyLock)
                                 except OSError:
                                     print("probably already deleted")
                                 transactionSuccessful()
@@ -452,7 +463,7 @@ def getCardID():
                             canvas.after_cancel(timer)
                             kartySubor.close()
                             kartyLockSubor.close()
-                            os.remove("KARTY_LOCK.txt")
+                            os.remove(pathKartyLock)
                             return
                             
 
@@ -464,7 +475,7 @@ def getCardID():
                         canvas.after_cancel(timer)
                         kartySubor.close()
                         kartyLockSubor.close()
-                        os.remove("KARTY_LOCK.txt")
+                        os.remove(pathKartyLock)
                         return
                         
 
@@ -477,7 +488,7 @@ def getCardID():
                     canvas.after_cancel(timer)
                     kartySubor.close()
                     kartyLockSubor.close()
-                    os.remove("KARTY_LOCK.txt")
+                    os.remove(pathKartyLock)
                     return
                     
                     
@@ -486,7 +497,7 @@ def getCardID():
         try:    
             kartySubor.close() 
             kartyLockSubor.close()
-            os.remove("KARTY_LOCK.txt")
+            os.remove(pathKartyLock)
             print("wrong number")
             enableEntries()
             transakciePaywall()
@@ -500,11 +511,11 @@ def creditOrDebet():
     if (kartyriadok.split(";")[2]=="D"):
         print("debet card")
         senderDebetKredit="Debet"
-        if (os.path.exists("UCTY_LOCK.txt")):
+        if (os.path.exists(pathUctyLock)):
             canvas.after(2000,creditOrDebet)
-        elif(os.path.exists("UCTY_LOCK.txt")==False):
-            uctyLockSubor = open("UCTY_LOCK.txt","w+")
-            uctySubor = open("UCTY.txt","r+")
+        elif(os.path.exists(pathUctyLock)==False):
+            uctyLockSubor = open(pathUctyLock,"w+")
+            uctySubor = open(pathUcty,"r+")
             uctyriadok = uctySubor.readline()
             for i in range (int(uctyriadok)):
                 uctyriadok = uctySubor.readline()
@@ -524,20 +535,20 @@ def creditOrDebet():
                         break          
             uctySubor.close()
             uctyLockSubor.close()
-            os.remove("UCTY_LOCK.txt")
+            os.remove(pathUctyLock)
             try:
                 kartyLockSubor.close()
-                os.remove("KARTY_LOCK.txt")
+                os.remove(pathKartyLock)
             except :
                 print("karty lock was probably already deleted")
     elif(kartyriadok.split(";")[2]=="K"):
         print("credit card")
         senderDebetKredit = "Kredit"
-        if (os.path.exists("UCTY_LOCK.txt")):
+        if (os.path.exists(pathUctyLock)):
             canvas.after(2000,creditOrDebet)
-        elif(os.path.exists("UCTY_LOCK.txt")==False):
-            uctyLockSubor = open("UCTY_LOCK.txt","w+")
-            uctySubor = open("UCTY.txt","r+")
+        elif(os.path.exists(pathUctyLock)==False):
+            uctyLockSubor = open(pathUctyLock,"w+")
+            uctySubor = open(pathUcty,"r+")
             uctyriadok = uctySubor.readline()
             for i in range (int(uctyriadok)):
                 uctyriadok = uctySubor.readline()
@@ -556,10 +567,10 @@ def creditOrDebet():
                         break
             uctySubor.close()
             uctyLockSubor.close()
-            os.remove("UCTY_LOCK.txt")
+            os.remove(pathUctyLock)
             try:
                 kartyLockSubor.close()
-                os.remove("KARTY_LOCK.txt")
+                os.remove(pathKartyLock)
             except :
                 print("karty lock was probably already deleted")
 
@@ -573,11 +584,11 @@ def transakciePaywall():
     arr = []
     datum = datetime.date.today().strftime('%d%m%Y')
     najvacsiecisloTP = 0
-    if (os.path.exists("TRANSAKCIE_PAYWALL_LOCK.txt")):
+    if (os.path.exists(pathTransakciePaywallLock)):
             canvas.after(2000,creditOrDebet)
-    elif(os.path.exists("TRANSAKCIE_PAYWALL_LOCK.txt")==False):
-        locksubor = open("TRANSAKCIE_PAYWALL_LOCK.txt","w+")
-        starysubor = open("TRANSAKCIE_PAYWALL.txt", "a+")
+    elif(os.path.exists(pathTransakciePaywallLock)==False):
+        locksubor = open(pathTransakciePaywallLock,"w+")
+        starysubor = open(pathTransakciePaywall, "a+")
         starysubor.seek(0)
         num = starysubor.readline().strip()
         for i in range (int(num)):
@@ -586,29 +597,31 @@ def transakciePaywall():
             if(najvacsiecisloTP<int(riadok.split(";")[0])):
                 najvacsiecisloTP=int(riadok.split(";")[0])
         starysubor.close()
-        novysubor = open("TRANSAKCIE_PAYWALL.txt", "w+")
+        novysubor = open(pathTransakciePaywall, "w+")
         novysubor.write(str(int(num)+1))
         for i in range (len(arr)):
             novysubor.write("\n" + arr[i])
-        if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
+        if (os.path.exists(pathTransakcieUctyLock)):
             canvas.after(2000,transakciePaywall)
-        elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
-            docasnyFile = open("TRANSAKCIE_UCTY.txt", "r")
-            docasnyLockFile = open("TRANSAKCIE_UCTY_LOCK.txt", "w")
+        elif(os.path.exists(pathTransakcieUctyLock)==False):
+            docasnyFile = open(pathTransakcieUcty, "r")
+            docasnyLockFile = open(pathTransakcieUctyLock, "w")
             if (successfulPayment==1):
-                idtransakcie = int(docasnyFile.readline())+1 ## +1 ? maybee
+                riadkyid = docasnyFile.readlines()
+                riadokid = riadkyid[len(riadkyid)-1]
+                idtransakcie = int(int(riadokid.split(";")[0])+1)
             elif(successfulPayment!=1):
                 idtransakcie = 0
             novysubor.write("\n" + str(int(najvacsiecisloTP)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+str(idtransakcie)+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
             docasnyFile.close()
             docasnyLockFile.close()
-            os.remove("TRANSAKCIE_UCTY_LOCK.txt")   
+            os.remove(pathTransakcieUctyLock)   
         if (successfulPayment==1):
             transakcieUcty()
             successfulPayment=0
         novysubor.close()
         locksubor.close()
-        os.remove("TRANSAKCIE_PAYWALL_LOCK.txt")
+        os.remove(pathTransakciePaywallLock)
         
 
 def resetPaywallVariables():
@@ -629,11 +642,11 @@ def transakcieKarty():
     numTK = 0
     arrTK = []
     najvacsiecisloTK = 0
-    if (os.path.exists("TRANSAKCIE_KARTY_LOCK.txt")):
+    if (os.path.exists(pathTransakcieKartyLock)):
             canvas.after(2000,creditOrDebet)
-    elif(os.path.exists("TRANSAKCIE_KARTY_LOCK.txt")==False):
-        lockTKsubor = open("TRANSAKCIE_KARTY_LOCK.txt","w+")
-        staryTKsubor = open("TRANSAKCIE_KARTY.txt", "a+")
+    elif(os.path.exists(pathTransakcieKartyLock)==False):
+        lockTKsubor = open(pathTransakcieKartyLock,"w+")
+        staryTKsubor = open(pathTransakcieKarty, "a+")
         staryTKsubor.seek(0)
         numTK = staryTKsubor.readline().strip()
         for i in range (int(numTK)):
@@ -642,7 +655,7 @@ def transakcieKarty():
             if (int(riadokTK.split(";")[0])>najvacsiecisloTK):
                 najvacsiecisloTK = int(riadokTK.split(";")[0])
         staryTKsubor.close()
-        novyTKsubor = open("TRANSAKCIE_KARTY.txt", "w+")
+        novyTKsubor = open(pathTransakcieKarty, "w+")
         novyTKsubor.write(str(int(numTK)+1))
         print("najvacsie cislo je : " + str(riadokTK.split(";")[0]))
         for i in range (len(arrTK)):
@@ -650,7 +663,7 @@ def transakcieKarty():
         novyTKsubor.write("\n" + str(int(najvacsiecisloTK)+1)+";"+str(cardID)+";"+str(Amount)+";"+str(obchodnikID))
         novyTKsubor.close()
         lockTKsubor.close()
-        os.remove("TRANSAKCIE_KARTY_LOCK.txt")
+        os.remove(pathTransakcieKartyLock)
 
 def transakcieUcty():
     global Amount, successfulPayment, obchodnikID, klientID, cardID, ucetID, obchodnikID, obchodnikUcet
@@ -659,11 +672,11 @@ def transakcieUcty():
     arrTU = []
     datum = datetime.date.today().strftime('%d%m%Y')
     najvacsiecisloTU = 0
-    if (os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")):
+    if (os.path.exists(pathTransakcieUctyLock)):
             canvas.after(2000,creditOrDebet)
-    elif(os.path.exists("TRANSAKCIE_UCTY_LOCK.txt")==False):
-        lockTUsubor = open("TRANSAKCIE_UCTY_LOCK.txt","w+")
-        staryTUsubor = open("TRANSAKCIE_UCTY.txt", "a+")
+    elif(os.path.exists(pathTransakcieUctyLock)==False):
+        lockTUsubor = open(pathTransakcieUctyLock,"w+")
+        staryTUsubor = open(pathTransakcieUcty, "a+")
         staryTUsubor.seek(0)
         numTU = staryTUsubor.readline().strip()
         for i in range (int(numTU)):
@@ -672,7 +685,7 @@ def transakcieUcty():
             if (najvacsiecisloTU<int(riadokTU.split(";")[0])):
                 najvacsiecisloTU = int(riadokTU.split(";")[0])
         staryTUsubor.close()
-        novyTUsubor = open("TRANSAKCIE_UCTY.txt", "w+")
+        novyTUsubor = open(pathTransakcieUcty, "w+")
         novyTUsubor.write(str(int(numTU)+2))
         for i in range (len(arrTU)):
             novyTUsubor.write("\n" + arrTU[i])
@@ -680,7 +693,7 @@ def transakcieUcty():
         novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum))
         novyTUsubor.close()
         lockTUsubor.close()
-        os.remove("TRANSAKCIE_UCTY_LOCK.txt")
+        os.remove(pathTransakcieUctyLock)
     
 
 def moneyTransfer():
@@ -688,11 +701,11 @@ def moneyTransfer():
     arrDebet=[]
     if (senderDebetKredit=="Debet"):
         print("removing " + str(Amount) + " from his account")
-        if (os.path.exists("UCTY_LOCK.txt")):
+        if (os.path.exists(pathUctyLock)):
             canvas.after(2000,creditOrDebet)
-        elif(os.path.exists("UCTY_LOCK.txt")==False):
-            uctyLockSubor = open("UCTY_LOCK.txt","w+")
-            uctySubor = open("UCTY.txt","r+")
+        elif(os.path.exists(pathUctyLock)==False):
+            uctyLockSubor = open(pathUctyLock,"w+")
+            uctySubor = open(pathUcty,"r+")
             uctyriadok = uctySubor.readline()
             pocetriadkov = int(uctyriadok)
             for i in range (int(uctyriadok)):
@@ -731,16 +744,16 @@ def moneyTransfer():
                 
             uctySubor.close()
             uctyLockSubor.close()
-            os.remove("UCTY_LOCK.txt")
+            os.remove(pathUctyLock)
             
     elif (senderDebetKredit=="Kredit"):
         arrKredit=[]
         print("adding" + str(Amount) + " to his credit")
-        if (os.path.exists("KARTY_LOCK.txt")):
+        if (os.path.exists(pathKartyLock)):
             canvas.after(2000,creditOrDebet)
-        elif(os.path.exists("KARTY_LOCK.txt")==False):   
-            kartyLockSuborMoneyTransfer = open("KARTY_LOCK.txt","w+")
-            kartySuborMoneyTransfer = open("KARTY.txt","r+")
+        elif(os.path.exists(pathKartyLock)==False):   
+            kartyLockSuborMoneyTransfer = open(pathKartyLock,"w+")
+            kartySuborMoneyTransfer = open(pathKarty,"r+")
             kartyriadokMoneyTransfer = kartySuborMoneyTransfer.readline()
             pocetriadkovkredit = int(kartyriadokMoneyTransfer)
             for i in range(int(kartyriadokMoneyTransfer)):
@@ -762,14 +775,14 @@ def moneyTransfer():
 
             kartySuborMoneyTransfer.close()
             kartyLockSuborMoneyTransfer.close()
-            os.remove("KARTY_LOCK.txt")
+            os.remove(pathKartyLock)
 
-            if (os.path.exists("UCTY_LOCK.txt")):
+            if (os.path.exists(pathUctyLock)):
                 canvas.after(2000,creditOrDebet)
-            elif(os.path.exists("UCTY_LOCK.txt")==False):
+            elif(os.path.exists(pathUctyLock)==False):
                 arrKreditUcty=[]
-                uctyLockSuborK = open("UCTY_LOCK.txt","w+")
-                uctySuborK = open("UCTY.txt","r+")
+                uctyLockSuborK = open(pathUctyLock,"w+")
+                uctySuborK = open(pathUcty,"r+")
                 uctyriadokK = uctySuborK.readline()
                 pocetriadkovK = int(uctyriadokK)
                 for i in range (int(uctyriadokK)):
@@ -794,7 +807,7 @@ def moneyTransfer():
                         uctySuborK.write(arrKreditUcty[i])
                 uctySuborK.close()
                 uctyLockSuborK.close()
-                os.remove("UCTY_LOCK.txt")     
+                os.remove(pathUctyLock)     
 
                                          
 canvas.bind('<Button-1>', validateAll)
