@@ -62,6 +62,12 @@ pathTransakcieKarty = "TRANSAKCIE_KARTY.txt"
 pathTransakcieKartyLock = "TRANSAKCIE_KARTY_LOCK.txt"
 pathTransakcieUcty = "TRANSAKCIE_UCTY.txt"
 pathTransakcieUctyLock = "TRANSAKCIE_UCTY_LOCK.txt"
+pathTransakciePaywallVerzia = "TRANSAKCIE_PAYWALL_VERZIA.txt"
+pathTransakcieUctyVerzia = "TRANSAKCIE_UCTY_VERZIA.txt"
+pathTransakcieKartyVerzia = "TRANSAKCIE_KARTY_VERZIA.txt"
+pathUctyVerzia = "UCTY_VERZIA.txt"
+pathKartyVerzia = "KARTY_VERZIA.txt"
+
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -619,6 +625,7 @@ def transakciePaywall():
         if (successfulPayment==1):
             transakcieUcty()
             successfulPayment=0
+        increasePaywallVer()
         novysubor.close()
         locksubor.close()
         os.remove(pathTransakciePaywallLock)
@@ -642,6 +649,7 @@ def transakcieKarty():
     numTK = 0
     arrTK = []
     najvacsiecisloTK = 0
+    datum = datetime.date.today().strftime('%d%m%Y')
     if (os.path.exists(pathTransakcieKartyLock)):
             canvas.after(2000,creditOrDebet)
     elif(os.path.exists(pathTransakcieKartyLock)==False):
@@ -660,7 +668,8 @@ def transakcieKarty():
         print("najvacsie cislo je : " + str(riadokTK.split(";")[0]))
         for i in range (len(arrTK)):
             novyTKsubor.write("\n" + arrTK[i])
-        novyTKsubor.write("\n" + str(int(najvacsiecisloTK)+1)+";"+str(cardID)+";"+str(Amount)+";"+str(obchodnikID))
+        novyTKsubor.write("\n" + str(int(najvacsiecisloTK)+1)+";"+str(cardID)+";"+str(Amount)+";"+str(obchodnikID)+";"+str(datum))
+        increaseTransakcieKartyVer()
         novyTKsubor.close()
         lockTKsubor.close()
         os.remove(pathTransakcieKartyLock)
@@ -691,6 +700,7 @@ def transakcieUcty():
             novyTUsubor.write("\n" + arrTU[i])
         novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+1)+";"+ "C" +";"+"P"+";"+str(klientID)+";"+str(ucetID)+";"+"-"+str(Amount)+";"+str(int(numTU)+2)+";"+str(datum))
         novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum))
+        increaseTransakcieUctyVer()
         novyTUsubor.close()
         lockTUsubor.close()
         os.remove(pathTransakcieUctyLock)
@@ -740,8 +750,8 @@ def moneyTransfer():
                     print("after2: " + arrDebet[i][:len(arrDebet[i])-int(lengthPomocna2)]+newSuma2)
                 else:
                     uctySubor.write(arrDebet[i])
-                    
-                
+
+            increaseUctyVer()        
             uctySubor.close()
             uctyLockSubor.close()
             os.remove(pathUctyLock)
@@ -773,6 +783,7 @@ def moneyTransfer():
                 else:
                     kartySuborMoneyTransfer.write(arrKredit[i])
 
+            increaseKartyVer()
             kartySuborMoneyTransfer.close()
             kartyLockSuborMoneyTransfer.close()
             os.remove(pathKartyLock)
@@ -805,10 +816,50 @@ def moneyTransfer():
                         print("after2: " + arrKreditUcty[i][:len(arrKreditUcty[i])-int(lengthPomocna2K)]+new2)
                     else:
                         uctySuborK.write(arrKreditUcty[i])
+                increaseUctyVer()
                 uctySuborK.close()
                 uctyLockSuborK.close()
                 os.remove(pathUctyLock)     
 
-                                         
+def increasePaywallVer():
+    tempFilePayVer = open(pathTransakciePaywallVerzia, "r+")
+    tempNum = int(tempFilePayVer.readline().strip())
+    tempFilePayVer.seek(0)
+    tempFilePayVer.truncate()
+    tempFilePayVer.write(str(tempNum+1))
+    tempFilePayVer.close()
+
+def increaseTransakcieUctyVer():
+    tempFileTUVer = open(pathTransakcieUctyVerzia, "r+")
+    tempNum2 = int(tempFileTUVer.readline().strip())
+    tempFileTUVer.seek(0)
+    tempFileTUVer.truncate()
+    tempFileTUVer.write(str(tempNum2+1))
+    tempFileTUVer.close()
+
+def increaseTransakcieKartyVer():
+    tempFileTKVer = open(pathTransakcieKartyVerzia, "r+")
+    tempNum3 = int(tempFileTKVer.readline().strip())
+    tempFileTKVer.seek(0)
+    tempFileTKVer.truncate()
+    tempFileTKVer.write(str(tempNum3+1))
+    tempFileTKVer.close()
+
+def increaseUctyVer():
+    tempFileUctyVer = open(pathUctyVerzia, "r+")
+    tempNum4 = int(tempFileUctyVer.readline().strip())
+    tempFileUctyVer.seek(0)
+    tempFileUctyVer.truncate()
+    tempFileUctyVer.write(str(tempNum4+1))
+    tempFileUctyVer.close()
+    
+def increaseKartyVer():
+    tempFileKartyVer = open(pathKartyVerzia,"r+")
+    tempNum5 = int(tempFileKartyVer.readline().strip())
+    tempFileKartyVer.seek(0)
+    tempFileKartyVer.truncate()
+    tempFileKartyVer.write(str(tempNum5+1))
+    tempFileKartyVer.close()
+    
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
