@@ -8,7 +8,7 @@ import datetime
 import time
 import os
 
-## Velmi neelegantne, no najjednoduchsie riesenie, widgety (type==int) musia byt globalne, aby sa mohli widget.destroy() v inych definiciach
+#
 entryID=0
 buttonPrihlasit=0
 entryCardNum=0
@@ -698,8 +698,8 @@ def transakcieUcty():
         novyTUsubor.write(str(int(numTU)+2))
         for i in range (len(arrTU)):
             novyTUsubor.write("\n" + arrTU[i])
-        novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+1)+";"+ "C" +";"+"P"+";"+str(klientID)+";"+str(ucetID)+";"+"-"+str(Amount)+";"+str(int(numTU)+2)+";"+str(datum))
-        novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum))
+        novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+1)+";"+ "C" +";"+"P"+";"+str(klientID)+";"+str(ucetID)+";"+"-"+str(Amount)+";"+str(int(numTU)+2)+";"+str(datum)+";"+str(obchodnikID))
+        novyTUsubor.write("\n" + str(int(najvacsiecisloTU)+2)+";"+ "D" +";"+"P"+";"+str(obchodnikID)+";"+str(obchodnikUcet)+";"+"+"+str(Amount)+";"+str(int(numTU)+1)+";"+str(datum)+";"+str(klientID))
         increaseTransakcieUctyVer()
         novyTUsubor.close()
         lockTUsubor.close()
