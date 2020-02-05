@@ -68,6 +68,10 @@ pathTransakcieKartyVerzia = "TRANSAKCIE_KARTY_VERZIA.txt"
 pathUctyVerzia = "UCTY_VERZIA.txt"
 pathKartyVerzia = "KARTY_VERZIA.txt"
 
+###Color
+btnColor = "black"
+fontColor = "#71CAE7"
+
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -79,7 +83,7 @@ def menuScreen():
     entryID = tkinter.Entry(width=30,font = "Helvetica 15 bold")
     entryID.pack()
     entryID.place(x=1/2*w + 200,y=h-(0.62*h),height=30)
-    buttonPrihlasit = tkinter.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=getObchodnikID)
+    buttonPrihlasit = tkinter.Button(text='PRIHLÁSIŤ', font="Helvetica 15",command=getObchodnikID, bg = btnColor, foreground=fontColor, cursor="hand2",activeforeground=fontColor,activebackground=btnColor)
     buttonPrihlasit.pack()
     buttonPrihlasit.place(x=1/2*w,y=h-(0.4*h))
     menuImg = tkinter.PhotoImage(master=canvas,file='obrazky/menu.png')
@@ -136,7 +140,7 @@ def paymentScreen():
         entryCardNum = tkinter.Entry(width=30,font = "Helvetica 15 bold",textvariable=cardTypeSV)
         entryCardNum.pack()
         entryCardNum.place(x=(w//2)-275,y=h-(0.78*h),height=30)
-        canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum splatnosti: " ,font="Arial 19", anchor="w")
+        canvas.create_text((w//2)-275,h-(0.65*h),text="Dátum platnosti: " ,font="Arial 19", anchor="w")
         canvas.create_text((w//2)+75,h-(0.65*h),text="CVV kód: " ,font="Arial 19", anchor="w")
         cardDateSV=tkinter.StringVar()
         cardDateSV.trace("w", lambda name, index, mode, sv=cardDateSV: validateDate())
@@ -156,10 +160,10 @@ def paymentScreen():
         entryAmount.pack()
         entryAmount.place(x=(w//2),y=h-(0.37*h),height=30)
         canvas.create_text((w//2)+100,h-(0.35*h),text="€",font="Arial 22", anchor="w")
-        buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transactionValidation)
+        buttonPayment = tkinter.Button(text='VYKONAŤ PLATBU', font="Helvetica 15", command=transactionValidation,bg = btnColor, foreground=fontColor, cursor="hand2",activeforeground=fontColor,activebackground=btnColor)
         buttonPayment.pack()
         buttonPayment.place(x=(w//2)-92,y=h-(0.3*h))
-        buttonBack = tkinter.Button(text='SPÄŤ', font="Helvetica 15",command=backBtn)
+        buttonBack = tkinter.Button(text='SPÄŤ', font="Helvetica 15",command=backBtn,bg = btnColor, foreground=fontColor, cursor="hand2",activeforeground=fontColor,activebackground=btnColor)
         buttonBack.pack()
         buttonBack.place(x=(w//2)-300,y=h-(0.3*h))
         errorCreditInfo() 
