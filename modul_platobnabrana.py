@@ -741,7 +741,7 @@ def moneyTransfer():
                         uctySubor.write(arrDebet[i][:len(arrDebet[i])-int(lengthPomocna)]+newSuma)
                     print("old suma : " + str(oldSuma) + " and new suma: " + str(newSuma))
                     print("after: " + arrDebet[i][:len(arrDebet[i])-int(lengthPomocna)]+newSuma)
-                elif(int(arrDebet[i].split(";")[1])==int(obchodnikID)):
+                elif(int(arrDebet[i].split(";")[0])==int(obchodnikID)):
                     oldSuma2 = arrDebet[i].split(";")[4].strip()
                     newSuma2=str(float(float(oldSuma2)+float(Amount)))
                     print("before2: " + str(arrDebet[i].split(";")[4]))
@@ -807,7 +807,7 @@ def moneyTransfer():
                 uctySuborK.truncate()
                 uctySuborK.write(str(pocetriadkovK)+"\n")
                 for i in range(len(arrKreditUcty)):
-                    if(int(arrKreditUcty[i].split(";")[1])==int(obchodnikID)):
+                    if(int(arrKreditUcty[i].split(";")[0])==int(obchodnikID)):
                         old2 = arrKreditUcty[i].split(";")[4].strip()
                         new2=str(float(float(old2)+float(Amount)))
                         print("before2: " + str(arrKreditUcty[i].split(";")[4]))
