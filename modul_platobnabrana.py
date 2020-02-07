@@ -1,4 +1,5 @@
 import tkinter
+from tkinter import messagebox
 w = 1280
 h = 720
 canvas = tkinter.Canvas(width=w,height=h,bg="#71CAE7")
@@ -71,7 +72,8 @@ pathKartyVerzia = "KARTY_VERZIA.txt"
 ###Color
 btnColor = "black"
 fontColor = "#71CAE7"
-
+labeleasterImg=0
+buttonUgly=0
 
 def menuScreen():
     global w,h,entryID, buttonPrihlasit,menuImg,labelMenuImg
@@ -369,6 +371,7 @@ def cardTypeChecker():
 def transaction():
     global Amount,entryAmount, CardNumber,dateCard,CVV
     print("gg")
+    EasterEgg1()
     try:
         if (len(entryAmount.get())>0 and float(entryAmount.get())>0.00):
             canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
@@ -867,6 +870,27 @@ def increaseKartyVer():
     tempFileKartyVer.truncate()
     tempFileKartyVer.write(str(tempNum5+1))
     tempFileKartyVer.close()
+
+def EasterEgg1():
+    global labeleasterImg,entryAmount,easterImg, buttonUgly
+    try:
+        if (str(entryAmount.get().lower())=="iskubosingle?" or str(entryAmount.get().lower())=="is kubo single?" or str(entryAmount.get().lower())=="is jakub single?"):
+            easterImg = tkinter.PhotoImage(master=canvas,file='obrazky/donotrecover.png')
+            labeleasterImg = tkinter.Label(image = easterImg,borderwidth=0)
+            labeleasterImgimage = easterImg
+            labeleasterImg.pack()
+            labeleasterImg.place(x=0.3*w,y=0.15*h)
+            buttonUgly= tkinter.Button(text='uh ugly', font="Helvetica 15",command=DeleteUgliness, cursor="heart")
+            buttonUgly.config(height = 5, width =15)
+            buttonUgly.pack()
+            buttonUgly.place(x=0.42*w,y=0.8*h)
+    except:
+        print("No Image for easter egg")
+def DeleteUgliness():
+    global labeleasterImg, buttonUgly
+    labeleasterImg.config(image='')
+    labeleasterImg.destroy()
+    buttonUgly.destroy()
     
 canvas.bind('<Button-1>', validateAll)
 menuScreen()
