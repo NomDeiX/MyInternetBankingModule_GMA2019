@@ -369,22 +369,25 @@ def cardTypeChecker():
 def transaction():
     global Amount,entryAmount, CardNumber,dateCard,CVV
     print("gg")
-    if (len(entryAmount.get())>0 and float(entryAmount.get())>0.00):
-        canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
-        canvas.create_text(650,670,text="Transakcia sa spracúvava",font="Helvetica 18")
-        loadingGIF()
-        disableEntries()
-        print("starting transaction")
-        Amount = float(entryAmount.get())
-        Amount = float(str(Amount)[:str(Amount).find(".")+3])
-        print("Amount: " + str(Amount))
-        getCardID()
-        #transactionSuccessful()
-    elif(len(entryAmount.get())==0):
-        print("transcation failed")
-        canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50 €" ,font="Arial 14", anchor="w", fill="red")
-     
+    try:
+        if (len(entryAmount.get())>0 and float(entryAmount.get())>0.00):
+            canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
+            canvas.create_text(650,670,text="Transakcia sa spracúvava",font="Helvetica 18")
+            loadingGIF()
+            disableEntries()
+            print("starting transaction")
+            Amount = float(entryAmount.get())
+            Amount = float(str(Amount)[:str(Amount).find(".")+3])
+            print("Amount: " + str(Amount))
+            getCardID()
+        elif(len(entryAmount.get())==0 or entryAmount.get()[0]=="-" ):
+            print("transcation failed")
+            canvas.create_text((w//2)+130,h-(0.35*h),text="Zadajte sumu v tvare 100.50 €" ,font="Arial 14", anchor="w", fill="red")
 
+    except  ValueError:
+        print("error value error")
+        tkinter.messagebox.showinfo("Neplatná suma","Zadajte prosím sumu v správnom formáte bez čiarok",icon="warning")
+          
 
 def loadingGIF():
     global casGIF,timer
