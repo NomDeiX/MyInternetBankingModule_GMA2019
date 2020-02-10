@@ -373,7 +373,7 @@ def transaction():
     print("gg")
     EasterEgg1()
     try:
-        if (len(entryAmount.get())>0 and float(entryAmount.get())>0.00):
+        if (len(entryAmount.get())>0 and float(entryAmount.get())>0.01):
             canvas.create_rectangle(350,700,950,575,fill="#71CAE7")
             canvas.create_text(650,670,text="Transakcia sa spracúvava",font="Helvetica 18")
             loadingGIF()
@@ -628,7 +628,7 @@ def transakciePaywall():
                 idtransakcie = int(int(riadokid.split(";")[0])+1)
             elif(successfulPayment!=1):
                 idtransakcie = 0
-            novysubor.write("\n" + str(int(najvacsiecisloTP)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+str(idtransakcie)+";"+str(obchodnikID)+";"+CardNumber+";"+str(successfulPayment)+";"+datum)
+            novysubor.write("\n" + str(int(najvacsiecisloTP)+1)+";"+ str(cardID) +";"+str(Amount)+";"+str(klientID)+";"+str(idtransakcie)+";"+str(obchodnikID)+";"+str(CardNumber.replace(' ',''))+";"+str(successfulPayment)+";"+datum)
             docasnyFile.close()
             docasnyLockFile.close()
             os.remove(pathTransakcieUctyLock)   
